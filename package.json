@@ -1,0 +1,26 @@
+{
+  "name": "codigo-proyecto",
+  "version": "1.0.0",
+  "description": "Aplicacion para administrar y hacer pedidos en restaurante Delilah Resto",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nataliacamero/delilah-resto.git"
+  },
+  "keywords": [
+    "javascript",
+    "app",
+    "appRestaurante",
+    "pedidos"
+  ],
+  "author": "Natalia Camero Carreño",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nataliacamero/delilah-resto/issues"
+  },
+  "homepage": "https://github.com/nataliacamero/delilah-resto#readme"
+}
