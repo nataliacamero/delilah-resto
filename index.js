@@ -1,5 +1,18 @@
 const express = require('express');
 const app = express();
+const jwt = require('jsonwebtoken')
+const informacionUsuario = { nombre : 'Natalia'}
+const firma = 'MateitoGusi123'
+const token = jwt.sign(informacionUsuario, firma);
+console.log("token codificado: " , token);
+const descodificado = jwt.verify(token, firma);
+console.log("token descodificado: ", descodificado);
+const validacion = require('./validacion');
+const validacionUsuarioContrasena = validacion.validarAutenticacion;
+
+
+
+
 
 app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
 
@@ -69,15 +82,21 @@ sequelize.sync({ force: true }).then(() => {
 });
 
 
- 
-app.use(express.json());
+
 
 
 //Routes
-
+app.use(express.json());
 
 //Bienvenida
 app.get('/', (req, res) => res.send('Delilah Restó App'));
+
+
+
+
+
+
+
 
 //-------------------------PRODUCTOS---------------------------------------------------
 
@@ -231,4 +250,49 @@ app.delete('/productos/:indiceProductos', function(req, res) {
   }).then((nombre) => {
     res.sendStatus(200);
   });
+});
+//------------------------------------------------------------------------------------------------------------------
+
+
+
+//Login
+
+app.post('/login', (req, res) => {
+  const {usuario, contrasena} = req.body;
+  console.log(usuario);
+  console.log(contrasena);
+  console.log(validacionUsuarioContrasena(usuario, contrasena));
+  
+  const validacionUsuario = validacionUsuarioContrasena(usuario, contrasena);
+
+  if (!validacionUsuario) {
+    res.json({ error: "Usuario o contraseña incorrecta."});
+    return;
+  }
+
+  const token = jwt.sign(usuario, contrasena);
+  res.json(token);
+  console.log(token)
+});
+
+//Metodo Seguro
+
+const autenticarUsuario = (req, res, next) => {
+console.log(req.headers.authorization);
+console.log(req.headers.authorization.split(' ')[1]);
+try{
+  const token = req.headers.authorization.split(' ')[1];
+  console.log(token);
+  const verificarToken = jwt.verify(token, firma);
+  if(verificarToken){
+    req.usuario = verificarToken;
+    return next();
+  }
+} catch(error) {
+  res.json({ error: "Error al validar el usuario."})
+}
+};
+
+app.post('/seguro', autenticarUsuario, (req,res) => {
+res.send(`Esta es una página autenticada. Hola ${req.usuario}`)
 });
