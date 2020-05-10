@@ -3,12 +3,12 @@ const app = express();
 const jwt = require('jsonwebtoken')
 const informacionUsuario = { nombre : 'Natalia'}
 const firma = 'MateitoGusi123'
-const token = jwt.sign(informacionUsuario, firma);
-console.log("token codificado: " , token);
-const descodificado = jwt.verify(token, firma);
-console.log("token descodificado: ", descodificado);
-const validacion = require('./validacion');
-const validacionUsuarioContrasena = validacion.validarAutenticacion;
+// const token = jwt.sign(informacionUsuario, firma);
+// console.log("token codificado: " , token);
+// const descodificado = jwt.verify(token, firma);
+// console.log("token descodificado: ", descodificado);
+// const validacion = require('./validacion');
+// const validacionUsuarioContrasena = validacion.validarAutenticacion;
 
 
 
@@ -19,7 +19,9 @@ app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
 //Configuracion Base de datos
 
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('mysql://root:Natalita@localhost:3306/Delilah_Resto');
+const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto');
+
+
 
 //Creando tabla productos
 
@@ -61,6 +63,7 @@ const Usuarios = sequelize.define('usuarios',{
   email: Sequelize.STRING,
   telefono: Sequelize.STRING,
   direccioEnvio: Sequelize.STRING,
+  nombreUsuario: Sequelize.STRING,
   password: Sequelize.STRING,
   rol: Sequelize.STRING
 });
@@ -69,10 +72,10 @@ sequelize.sync({ force: true }).then(() => {
     console.log(`Database & tables created!`);
 
     Usuarios.bulkCreate([
-      { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", password: "KJUBHYAS&&%TUGYGYJ", rol: "Administrador" },
-      { nombre: 'Camilo', apellido: "Barrera", email:"camilobarrera@gmail.com", telefono: "3023445566", direccioEnvio:"Calle 1 # 56 99", password: "jg76ertwygbdsfy", rol: "usuario" },
-      { nombre: 'Andres', apellido: "Ayala", email:"andresayala@gmail.com", telefono: "3036775477", direccioEnvio:"Carrera 45 # 8 67", password: "srfnw7ryiwhfjksdh", rol: "usuario" },
-      { nombre: 'Gustavo', apellido: "Maggi", email:"gustavomaggi@gmail.com", telefono: "3057634387", direccioEnvio:"Calle 145 # 46 78", password: "jhgf77tqwyxnfjd", rol: "usuario" },
+      { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "nataliacameroc@gmail.com", password: "KJUBHYAS&&%TUGYGYJ", rol: "Administrador" },
+      { nombre: 'Camilo', apellido: "Barrera", email:"camilobarrera@gmail.com", telefono: "3023445566", direccioEnvio:"Calle 1 # 56 99", nombreUsuario: "camilobarrera@gmail.com", password: "jg76ertwygbdsfy", rol: "usuario" },
+      { nombre: 'Andres', apellido: "Ayala", email:"andresayala@gmail.com", telefono: "3036775477", direccioEnvio:"Carrera 45 # 8 67", nombreUsuario: "andresayala@gmail.com", password: "srfnw7ryiwhfjksdh", rol: "usuario" },
+      { nombre: 'Gustavo', apellido: "Maggi", email:"gustavomaggi@gmail.com", telefono: "3057634387", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "gustavomaggi@gmail.com", password: "jhgf77tqwyxnfjd", rol: "usuario" },
     ]).then(function() {
       
       return Usuarios.findAll();
@@ -141,7 +144,7 @@ app.get('/usuarios/:indiceUsuarios', (req, res) => {
 //Post, opcion de crear una nueva cuenta USUARIO
 
 app.post('/usuarios', function(req, res) {
-  Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, password: req.body.password, rol: req.body.rol }).then(function(nombre) {
+  Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: req.body.rol }).then(function(nombre) {
     res.json(nombre);
     console.log("Usuario creado")
   });
@@ -159,6 +162,7 @@ app.put('/usuarios/:indiceUsuario', function(req, res) {
       email: req.body.email,
       telefono: req.body.telefono,
       direccioEnvio: req.body.direccioEnvio,
+      nombreUsuario: req.body.nombreUsuario,
       password: req.body.password,
       rol: req.body.rol
   }).then((nombre) => {
@@ -258,22 +262,30 @@ app.delete('/productos/:indiceProductos', function(req, res) {
 //Login
 
 app.post('/login', (req, res) => {
-  const {usuario, contrasena} = req.body;
-  console.log(usuario);
-  console.log(contrasena);
-  console.log(validacionUsuarioContrasena(usuario, contrasena));
-  
-  const validacionUsuario = validacionUsuarioContrasena(usuario, contrasena);
 
-  if (!validacionUsuario) {
-    res.json({ error: "Usuario o contraseña incorrecta."});
-    return;
-  }
+  let {nombreUsuario, password} = req.body;
+  console.log("Linea 266", nombreUsuario);
+  console.log("Linea 267", password);
 
-  const token = jwt.sign(usuario, contrasena);
-  res.json(token);
-  console.log(token)
+  sequelize.authenticate().then(async () => {
+    let {nombreUsuario, password} = req.body;
+    const query = `SELECT nombre, nombreUsuario,password FROM Delilah_Resto.usuarios WHERE nombreUsuario = ${JSON.stringify(nombreUsuario)} AND password = ${JSON.stringify(password)};`;
+    const [resultados] =  await sequelize.query(query, { raw: true })
+    console.log(resultados);
+    if (resultados.length > 0) {
+      const token = jwt.sign({nombre: resultados[0].nombre, password: password}, firma);
+      res.json(token);
+      console.log(token)
+      console.log("Linea 278: ", resultados[0].nombreUsuario);
+      console.log("Linea 279: ", resultados[0].password);
+      return
+    } else {
+      res.json({ error: "Usuario o contraseña incorrecta."});
+      return
+    }
+  })
 });
+
 
 //Metodo Seguro
 
@@ -294,5 +306,6 @@ try{
 };
 
 app.post('/seguro', autenticarUsuario, (req,res) => {
-res.send(`Esta es una página autenticada. Hola ${req.usuario}`)
+res.send(`Esta es una página autenticada. Hola ${req.usuario.nombre}`)
 });
+

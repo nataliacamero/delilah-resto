@@ -1,8 +1,4 @@
-function validarAutenticacion(user, password) {
-    if (user === 'Natalia' && password === 'MateitoGusi123'){
-      return true
-    }
-};
+
 
 const db = [
       { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", password: "MateitoGusi123", rol: "Administrador" },
