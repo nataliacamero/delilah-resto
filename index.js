@@ -137,8 +137,8 @@ const autenticarUsuario = (req, res, next) => {
   if (!req.headers.authorization) { // y no esta en la base de datos
     res.json({ error: "No te has logeado"})
   } else {
-    console.log("Linea 138: ",req.headers.authorization);
-    console.log("Linea 139: ",req.headers.authorization.split(' ')[1]);
+    console.log("Linea 140: ",req.headers.authorization);
+    console.log("Linea 141: ",req.headers.authorization.split(' ')[1]);
     try{
       const token = req.headers.authorization.split(' ')[1];
       console.log(token);
@@ -153,9 +153,9 @@ const autenticarUsuario = (req, res, next) => {
   }
 };
 
-app.use(autenticarUsuario);
 
-app.post('/seguro', (req,res) => {
+
+app.post('/seguro', autenticarUsuario, (req,res) => {
 res.send(`Esta es una página autenticada. Hola ${req.usuario.nombre}. Tu rol es ${req.usuario.rol}`)
 });
 
@@ -164,7 +164,7 @@ res.send(`Esta es una página autenticada. Hola ${req.usuario.nombre}. Tu rol es
 function authRole(role) {
   
   return (req, res, next) => {
-    console.log(req.usuario.rol.toString())
+    console.log("Linea 167: ",req.usuario.rol.toString())
     if (req.usuario.rol !== role) {
       res.status(401)
       return res.send('No es permitido el acceso a este recurso.')
@@ -179,7 +179,7 @@ function authRole(role) {
 
 //Get Usuarios
 
-app.get('/usuarios', authRole(ROLES.ADMIN), (req, res) => {
+app.get('/usuarios', autenticarUsuario, authRole(ROLES.ADMIN), (req, res) => {
   
   sequelize.authenticate().then(async () => {
         
@@ -199,20 +199,40 @@ app.get('/usuarios', authRole(ROLES.ADMIN), (req, res) => {
 
 //Get USUARIO por id
 
-app.get('/usuarios/:indiceUsuarios', (req, res) => {
+app.get('/usuarios/:indiceUsuarios', autenticarUsuario, (req, res) => {
  
   sequelize.authenticate().then(async () => {
     const indiceUsuarios = req.params.indiceUsuarios;
+    
+    const queryIdUsuario = `SELECT id FROM usuarios WHERE id = ${indiceUsuarios}` 
     const query = `SELECT * FROM usuarios WHERE id = ${indiceUsuarios}`;
-    const [resultados] =  await sequelize.query(query, { raw: true })
+    const [idResults] = await sequelize.query(queryIdUsuario, { raw: true });
+    const [resultados] = await sequelize.query(query, { raw: true });
+
+    console.log(typeof indiceUsuarios);
+    console.log("Linea 210: ", idResults[0].id.toString());
+    console.log(indiceUsuarios === idResults[0].id.toString());
     console.log(resultados);
-    res.json(resultados);
+
+    if(indiceUsuarios === idResults[0].id.toString()){
+      console.log("estoy validando")
+      res.json(resultados);
+    } else {
+      res.send('No es permitido el acceso a este recurso.')
+    }
+  
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err);
   });
 
 });
+
+function scopeUsuarios(usuarioId) {
+  console.log("Linea 222: ", idResults[0].id);
+
+  
+}
 
 
 //Post, opcion de crear una nueva cuenta USUARIO
@@ -226,7 +246,7 @@ app.post('/usuarios', function(req, res) {
 
 //Put, actualizar USUARIO por id
 
-app.put('/usuarios/:indiceUsuario', function(req, res) {
+app.put('/usuarios/:indiceUsuario', autenticarUsuario, function(req, res) {
 
   const indiceUsuario = req.params.indiceUsuario;
   Usuarios.findByPk(req.params.indiceUsuario).then(function(nombre) {
@@ -247,7 +267,7 @@ app.put('/usuarios/:indiceUsuario', function(req, res) {
 
 //Delete, borrar USUARIO por id
 
-app.delete('/usuarios/:indiceUsuario', authRole(ROLES.ADMIN), function(req, res) {
+app.delete('/usuarios/:indiceUsuario', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   const indiceUsuario = req.params.indiceUsuario;
   Usuarios.findByPk(req.params.indiceUsuario).then(function(nombre) {
     nombre.destroy();
@@ -260,7 +280,7 @@ app.delete('/usuarios/:indiceUsuario', authRole(ROLES.ADMIN), function(req, res)
 
 //Get productos
 
-app.get('/productos', (req, res) => {
+app.get('/productos', autenticarUsuario, (req, res) => {
 
   sequelize.authenticate().then(async () => {
 
@@ -279,7 +299,7 @@ app.get('/productos', (req, res) => {
 
 //Get productos por id
 
-app.get('/productos/:indiceProductos', (req, res) => {
+app.get('/productos/:indiceProductos', autenticarUsuario, (req, res) => {
  
   sequelize.authenticate().then(async () => {
     const indiceProductos = req.params.indiceProductos;
@@ -297,7 +317,7 @@ app.get('/productos/:indiceProductos', (req, res) => {
 
 //Post, crear productos
 
-app.post('/productos', authRole(ROLES.ADMIN), function(req, res) {
+app.post('/productos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   Productos.create({ nombre: req.body.nombre, imagen: req.body.imagen, precio: req.body.precio }).then(function(nombre) {
     res.json(nombre);
   });
@@ -305,7 +325,7 @@ app.post('/productos', authRole(ROLES.ADMIN), function(req, res) {
 
 //Put, actualizar producto por id
 
-app.put('/productos/:indiceProductos', authRole(ROLES.ADMIN), function(req, res) {
+app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
 
   const indiceProductos = req.params.indiceProductos;
   Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
@@ -321,7 +341,7 @@ app.put('/productos/:indiceProductos', authRole(ROLES.ADMIN), function(req, res)
 
 //Delete, borrar producto por id
 
-app.delete('/productos/:indiceProductos', authRole(ROLES.ADMIN), function(req, res) {
+app.delete('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   const indiceProductos = req.params.indiceProductos;
   Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
     nombre.destroy();
