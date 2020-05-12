@@ -202,8 +202,8 @@ app.get('/usuarios', autenticarUsuario, authRole(ROLES.ADMIN), (req, res) => {
 app.get('/usuarios/:indiceUsuarios', autenticarUsuario, (req, res) => {
  
   sequelize.authenticate().then(async () => {
-    const indiceUsuarios = req.params.indiceUsuarios;
     
+    const indiceUsuarios = req.params.indiceUsuarios;
     const queryIdUsuario = `SELECT id FROM usuarios WHERE id = ${indiceUsuarios}` 
     const query = `SELECT * FROM usuarios WHERE id = ${indiceUsuarios}`;
     const [idResults] = await sequelize.query(queryIdUsuario, { raw: true });
@@ -228,20 +228,32 @@ app.get('/usuarios/:indiceUsuarios', autenticarUsuario, (req, res) => {
 
 });
 
-function scopeUsuarios(usuarioId) {
-  console.log("Linea 222: ", idResults[0].id);
-
-  
-}
-
-
-//Post, opcion de crear una nueva cuenta USUARIO
+//Post, opcion para crear una nueva cuenta USUARIO, valida en bd si ya existe el nombreUsuario si no, se crea por defecto con rol de usuarioBasico.
 
 app.post('/usuarios', function(req, res) {
-  Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: req.body.rol }).then(function(nombre) {
-    res.json(nombre);
-    console.log("Usuario creado")
+
+  sequelize.authenticate().then(async () => {
+      
+    const query = `SELECT nombreUsuario FROM usuarios WHERE nombreUsuario = ${JSON.stringify(req.body.nombreUsuario)}` 
+    const [resultados] = await sequelize.query(query, { raw: true });
+
+    console.log(resultados);
+
+    if(resultados.length > 0 ){
+      res.send('El usuario ya existe en la base de datos');
+    } else {
+      Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: ROLES.BASIC }).then(function(nombre) {
+        res.json(nombre);
+        console.log("Usuario creado")
+      });
+    }
+  
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
   });
+
+  
 });
 
 //Put, actualizar USUARIO por id
@@ -258,12 +270,14 @@ app.put('/usuarios/:indiceUsuario', autenticarUsuario, function(req, res) {
       direccioEnvio: req.body.direccioEnvio,
       nombreUsuario: req.body.nombreUsuario,
       password: req.body.password,
-      rol: req.body.rol
+      rol: ROLES.BASIC
   }).then((nombre) => {
       res.json(nombre);
     });
   });
 });
+
+
 
 //Delete, borrar USUARIO por id
 
