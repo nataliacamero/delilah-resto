@@ -91,6 +91,52 @@ sequelize.sync({ force: true }).then(() => {
 });
 
 
+//Creando Tabla Pedidos
+
+const Pedidos = sequelize.define('pedidos',{
+  fecha: Sequelize.DATE,
+  cantidad: Sequelize.INTEGER,
+  total: Sequelize.INTEGER,
+});
+
+//Relacion uno a muchos Usuarios-Pedidos
+
+
+Usuarios.hasMany(Pedidos);
+Pedidos.belongsTo(Usuarios);
+
+//------------------------------------------------------------------
+
+sequelize.sync({ force: true }).then(() => {
+    console.log(`Database & tables created!`);
+
+    Pedidos.bulkCreate([
+      { fecha: '2020-05-15', cantidad: 4, total: 4, usuarioId: 1, productoId: 1 },
+      { fecha: '2020-05-15', cantidad: 3, total: 3, usuarioId: 2, productoId: 4 },
+      { fecha: '2020-05-15', cantidad: 7, total: 7, usuarioId: 3, productoId: 2 },
+      
+    ]).then(function() {
+      
+      return Pedidos.findAll();
+    }).then(function(pedidos) {
+      console.log(pedidos);
+    });
+});
+
+//Relacion Muchos a Muchos Pedidos-Productos
+
+
+Productos.belongsToMany(Pedidos, { through: 'Pedidos_productos'});
+Pedidos.belongsToMany(Productos, { through: 'Pedidos_productos' });
+
+
+
+//------------------------------------------------------------------
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
