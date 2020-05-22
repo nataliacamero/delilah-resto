@@ -27,11 +27,9 @@ app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
 const Sequelize = require('sequelize');
 const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto');
 
+//Creando tabla Producto
 
-
-//Creando tabla productos
-
-const Productos = sequelize.define('productos',{
+const Producto = sequelize.define('producto',{
   nombre: Sequelize.STRING,
   imagen: Sequelize.STRING,
   precio: Sequelize.INTEGER
@@ -40,7 +38,7 @@ const Productos = sequelize.define('productos',{
 sequelize.sync({ force: true }).then(() => {
     console.log(`Database & tables created!`);
 
-    Productos.bulkCreate([
+    Producto.bulkCreate([
       { nombre: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
       { nombre: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
       { nombre: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
@@ -54,16 +52,16 @@ sequelize.sync({ force: true }).then(() => {
 
     ]).then(function() {
       
-      return Productos.findAll();
-    }).then(function(productos) {
-      // console.log(productos);
+      return Producto.findAll();
+    }).then(function(Producto) {
+      // console.log(Producto);
     });
 });
 
 
 //Creando tabla USUARIOS
 
-const Usuarios = sequelize.define('usuarios',{
+const Usuario = sequelize.define('usuario',{
   nombre: Sequelize.STRING,
   apellido: Sequelize.STRING,
   email: Sequelize.STRING,
@@ -77,57 +75,93 @@ const Usuarios = sequelize.define('usuarios',{
 sequelize.sync({ force: true }).then(() => {
     console.log(`Database & tables created!`);
 
-    Usuarios.bulkCreate([
+    Usuario.bulkCreate([
       { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "nataliacameroc@gmail.com", password: "KJUBHYAS&&%TUGYGYJ", rol: "Administrador" },
       { nombre: 'Camilo', apellido: "Barrera", email:"camilobarrera@gmail.com", telefono: "3023445566", direccioEnvio:"Calle 1 # 56 99", nombreUsuario: "camilobarrera@gmail.com", password: "jg76ertwygbdsfy", rol: "usuarioBasico" },
       { nombre: 'Andres', apellido: "Ayala", email:"andresayala@gmail.com", telefono: "3036775477", direccioEnvio:"Carrera 45 # 8 67", nombreUsuario: "andresayala@gmail.com", password: "srfnw7ryiwhfjksdh", rol: "usuarioBasico" },
       { nombre: 'Gustavo', apellido: "Maggi", email:"gustavomaggi@gmail.com", telefono: "3057634387", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "gustavomaggi@gmail.com", password: "jhgf77tqwyxnfjd", rol: "usuarioBasico" },
     ]).then(function() {
       
-      return Usuarios.findAll();
-    }).then(function(usuarios) {
+      return Usuario.findAll();
+    }).then(function(usuario) {
       // console.log(usuarios);
     });
 });
 
 
-//Creando Tabla Pedidos
+//Creando Tabla Pedido
 
-const Pedidos = sequelize.define('pedidos',{
-  fecha: Sequelize.DATE,
-  cantidad: Sequelize.INTEGER,
-  total: Sequelize.INTEGER,
+const Pedido = sequelize.define('pedido',{
+  fecha: Sequelize.DATE
 });
 
-//Relacion uno a muchos Usuarios-Pedidos
+
+const tipo_pago = sequelize.define('tipo_pago',{
+  tipo_pago: Sequelize.STRING
+});
+
+const estado_pedido = sequelize.define('estado_pedido',{
+  estado: Sequelize.STRING
+});
 
 
-Usuarios.hasMany(Pedidos);
-Pedidos.belongsTo(Usuarios);
+const Pedidos_Producto = sequelize.define('pedidos_producto', {
+  cantidad: Sequelize.INTEGER,
+  precio: Sequelize.INTEGER
+  
+});
+
+//Relacion uno a uno
+
+Pedido.hasOne(tipo_pago);
+Pedido.hasOne(estado_pedido);
+
+
+//Relacion uno a muchos Usuarios-Pedido
+
+Usuario.hasMany(Pedido);
+
+
+//Relacion Muchos a Muchos Pedido-Producto
+
+Producto.belongsToMany(Pedido, { through: Pedidos_Producto });
+Pedido.belongsToMany(Producto, { through: Pedidos_Producto });
 
 //------------------------------------------------------------------
 
 sequelize.sync({ force: true }).then(() => {
     console.log(`Database & tables created!`);
 
-    Pedidos.bulkCreate([
-      { fecha: '2020-05-15', cantidad: 4, total: 4, usuarioId: 1, productoId: 1 },
-      { fecha: '2020-05-15', cantidad: 3, total: 3, usuarioId: 2, productoId: 4 },
-      { fecha: '2020-05-15', cantidad: 7, total: 7, usuarioId: 3, productoId: 2 },
+    Pedido.bulkCreate([
+      { fecha: '2020-05-15', usuarioId: 1 }
+
       
     ]).then(function() {
+      let pedido1
+      Pedido.findByPk(1).then( pedido => {
+        pedido1 = pedido
+        Producto.findByPk(1).then( producto => {
+          pedido1.addProducto(producto, { through: {
+            cantidad: 4,
+            precio: 30
+          }})
+        })
+      });
       
-      return Pedidos.findAll();
-    }).then(function(pedidos) {
-      console.log(pedidos);
+      
+      //pedido1 = Pedido.findByPk(1)
+      //console.log("pedido1", pedido1.id)
+      return Pedido.findAll();
+    }).then(function(Pedido) {
+      console.log(Pedido);
     });
+
+    
+
+
 });
 
-//Relacion Muchos a Muchos Pedidos-Productos
 
-
-Productos.belongsToMany(Pedidos, { through: 'Pedidos_productos'});
-Pedidos.belongsToMany(Productos, { through: 'Pedidos_productos' });
 
 
 
@@ -221,7 +255,7 @@ function authRole(role) {
 }
 
 
-//-------------------------PRODUCTOS---------------------------------------------------
+//-------------------------Producto---------------------------------------------------
 
 //Get Usuarios
 
@@ -336,9 +370,9 @@ app.delete('/usuarios/:indiceUsuario', autenticarUsuario, authRole(ROLES.ADMIN),
   });
 });
 
-//-------------------------PRODUCTOS---------------------------------------------------
+//-------------------------Producto---------------------------------------------------
 
-//Get productos
+//Get Producto
 
 app.get('/productos', autenticarUsuario, (req, res) => {
 
