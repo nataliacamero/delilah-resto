@@ -7,6 +7,7 @@ const ROLES = {
       ADMIN: 'Administrador',
       BASIC: 'usuarioBasico'
     }
+const asyncHandler = require('express-async-handler');
   
 
 // const token = jwt.sign(informacionUsuario, firma);
@@ -30,7 +31,7 @@ const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_R
 //Creando tabla Producto
 
 const Producto = sequelize.define('producto',{
-  nombre: Sequelize.STRING,
+  nombreProducto: Sequelize.STRING,
   imagen: Sequelize.STRING,
   precio: Sequelize.INTEGER
 });
@@ -39,16 +40,16 @@ sequelize.sync({ force: true }).then(() => {
     console.log(`Database & tables created!`);
 
     Producto.bulkCreate([
-      { nombre: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
-      { nombre: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
-      { nombre: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
-      { nombre: 'Hamburguesa de Cerdo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 40000 },
-      { nombre: 'Hamburguesa de aguacate', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 50000 },
-      { nombre: 'Coca cola', imagen: 'SOY LA IMAGEN DE LA cocacola', precio: 5000 },
-      { nombre: 'Agua', imagen: 'SOY LA IMAGEN DEL AGUA', precio: 3000 },
-      { nombre: 'Limonada de Mango', imagen: 'SOY LA IMAGEN DE LA LIMONADA DE MANGO', precio: 9000 },
-      { nombre: 'Limonada', imagen: 'SOY LA IMAGEN DE LA LIMONADA', precio: 5000 },
-      { nombre: 'Cafe', imagen: 'SOY LA IMAGEN DEL CAFE', precio: 8000 }
+      { nombreProducto: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
+      { nombreProducto: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
+      { nombreProducto: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
+      { nombreProducto: 'Hamburguesa de Cerdo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 40000 },
+      { nombreProducto: 'Hamburguesa de aguacate', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 50000 },
+      { nombreProducto: 'Coca cola', imagen: 'SOY LA IMAGEN DE LA cocacola', precio: 5000 },
+      { nombreProducto: 'Agua', imagen: 'SOY LA IMAGEN DEL AGUA', precio: 3000 },
+      { nombreProducto: 'Limonada de Mango', imagen: 'SOY LA IMAGEN DE LA LIMONADA DE MANGO', precio: 9000 },
+      { nombreProducto: 'Limonada', imagen: 'SOY LA IMAGEN DE LA LIMONADA', precio: 5000 },
+      { nombreProducto: 'Cafe', imagen: 'SOY LA IMAGEN DEL CAFE', precio: 8000 }
 
     ]).then(function() {
       
@@ -92,31 +93,16 @@ sequelize.sync({ force: true }).then(() => {
 //Creando Tabla Pedido
 
 const Pedido = sequelize.define('pedido',{
-  fecha: Sequelize.DATE
-});
-
-
-const tipo_pago = sequelize.define('tipo_pago',{
-  tipo_pago: Sequelize.STRING
-});
-
-const estado_pedido = sequelize.define('estado_pedido',{
+  fecha: Sequelize.DATE,
+  tipo_pago: Sequelize.STRING,
   estado: Sequelize.STRING
 });
-
 
 const Pedidos_Producto = sequelize.define('pedidos_producto', {
   cantidad: Sequelize.INTEGER,
   precio: Sequelize.INTEGER
   
 });
-
-//Relacion uno a uno
-
-Pedido.hasOne(tipo_pago);
-Pedido.hasOne(estado_pedido);
-
-
 //Relacion uno a muchos Usuarios-Pedido
 
 Usuario.hasMany(Pedido);
@@ -124,52 +110,12 @@ Usuario.hasMany(Pedido);
 
 //Relacion Muchos a Muchos Pedido-Producto
 
-Producto.belongsToMany(Pedido, { through: Pedidos_Producto });
-Pedido.belongsToMany(Producto, { through: Pedidos_Producto });
+Producto.belongsToMany(Pedido, { through: Pedidos_Producto, as:'pedidos', foreignKey: 'prouctoId', otherKey: 'pedidoId' });
+Pedido.belongsToMany(Producto, { through: Pedidos_Producto, as: 'productos', foreignKey: 'pedidoId', otherKey: 'productoId' });
 
-//------------------------------------------------------------------
-
-sequelize.sync({ force: true }).then(() => {
-    console.log(`Database & tables created!`);
-
-    Pedido.bulkCreate([
-      { fecha: '2020-05-15', usuarioId: 1 }
-
-      
-    ]).then(function() {
-      let pedido1
-      Pedido.findByPk(1).then( pedido => {
-        pedido1 = pedido
-        Producto.findByPk(1).then( producto => {
-          pedido1.addProducto(producto, { through: {
-            cantidad: 4,
-            precio: 30
-          }})
-        })
-      });
-      
-      
-      //pedido1 = Pedido.findByPk(1)
-      //console.log("pedido1", pedido1.id)
-      return Pedido.findAll();
-    }).then(function(Pedido) {
-      console.log(Pedido);
-    });
-
-    
-
-
-});
-
-
-
-
-
-//------------------------------------------------------------------
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
 
@@ -255,7 +201,7 @@ function authRole(role) {
 }
 
 
-//-------------------------Producto---------------------------------------------------
+//-------------------------Usuarios---------------------------------------------------
 
 //Get Usuarios
 
@@ -412,7 +358,7 @@ app.get('/productos/:indiceProductos', autenticarUsuario, (req, res) => {
 //Post, crear productos
 
 app.post('/productos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
-  Productos.create({ nombre: req.body.nombre, imagen: req.body.imagen, precio: req.body.precio }).then(function(nombre) {
+  Productos.create({ nombreProducto: req.body.nombre, imagen: req.body.imagen, precio: req.body.precio }).then(function(nombre) {
     res.json(nombre);
   });
 });
@@ -424,7 +370,7 @@ app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN),
   const indiceProductos = req.params.indiceProductos;
   Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
     nombre.update({
-      nombre: req.body.nombre,
+      nombreProducto: req.body.nombre,
       imagen: req.body.imagen,
       precio: req.body.precio
   }).then((nombre) => {
@@ -437,11 +383,112 @@ app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN),
 
 app.delete('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   const indiceProductos = req.params.indiceProductos;
-  Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
-    nombre.destroy();
+    Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
+      nombre.destroy();
+    }).then((nombre) => {
+      res.sendStatus(200);
+    });
+});
+
+//-------------------------------------PEDIDOS---------------------------------------------------------------------------
+
+//Crear pedido
+app.post('/pedidos/crear', async (req, res) => {
+  
+  try {
+      //Crear y guardar el pedido
+      const guardarPedido = await Pedido.create (req.body, {w:1}, { returning: true});
+      
+      //Recorro todos los productos en req.productos
+      
+      req.body.productos.forEach(async(item) => {
+        //Buscar el producto con el Id que dieron y asegurarme si existe. Si no, responder con status 400.
+        const producto = await Producto.findByPk(item.id);
+        // if(!producto) throw new Error("Este producto no existe");
+        
+        //Creo un diccionario con el cual crear el Pedidos_Producto
+        const pedidoProducto = {
+          pedidoId: guardarPedido.id,
+          productoId: item.id,
+          cantidad: item.cantidad,
+          precio: item.precio
+        }
+        //Crear y guardar un pedidoProducto
+        guardarPedidoProducto = await Pedidos_Producto.create(pedidoProducto, { w:1 }, {returning:true});
+        if(!guardarPedidoProducto) throw new Error("No se pudo guardar en la tabla de pedidos_producto");
+
+      });
+      console.log("sali del foreach")
+   
+      if (!guardarPedido)   throw new Error(`No fue posible guardar el producto ${item.id} en le pedido ${pedidoProducto.pedidoId}`);
+      
+      return res.status(200).json(guardarPedido);
+      
+  } catch (e) { console.log(e); }
+  
+});
+
+// //Get obtenemos toda la informacion de Pedidos y productos
+
+app.get('/pedidos', asyncHandler (async (req, res) => {
+
+  //Obtener todos los pedidos
+  const todoPedidos = await Pedido.findAll({
+    
+    //Asegurarse de incluir los productos
+    include: [{
+      model: Pedido,
+      as: 'pedidos',
+      required: false,
+      //Pasar los atributos del produto que deseo traer
+      attributes: [  'id', 'fecha','tipo_pago', 'estado' ],
+      through: {
+        //El codigo a continuacion, trae las propiedades de la tabla de union
+        model: Pedidos_Producto,
+        as: 'pedidos_producto',
+        attributes: ['cantidad', 'precio']
+      }
+    }]
+  });
+
+   //Si todo esta bien
+   return respondWith(res, 200, ['Returning all orders'], {todoPedidos});
+}));
+
+
+  // sequelize.authenticate().then(async () => {
+
+  //   const query = `SELECT * FROM pedidos JOIN pedidos_productos
+  //    ON pedidos.id = pedidos_productos.pedidoId JOIN productos 
+  //    ON pedidos_productos.productoId = productos.id 
+  //    ORDER BY pedidos.id ASC`;
+  //   const [resultados] =  await sequelize.query(query, { raw: true })
+  //   console.log(resultados);
+  //   res.json(resultados);    
+
+  // })
+  // .catch(err => {
+  //   console.error('Unable to connect to the database:', err);
+  // });
+
+// });
+
+//Actualizar Estado de pedidos
+
+//Put, actualizar pedido por id
+
+app.put('/productos/:indicePedido', function(req, res) {
+
+  const indicePedidos = req.params.indicePedido;
+  Pedido.findByPk(req.params.indicePedido).then(function(nombre) {
+    nombre.update({
+      fecha: req.body.fecha,
+      tipo_pago: req.body.tipo_pago,
+      estado: req.body.estado
   }).then((nombre) => {
-    res.sendStatus(200);
+      res.json(nombre);
+    });
   });
 });
-//------------------------------------------------------------------------------------------------------------------
+
 
