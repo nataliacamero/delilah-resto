@@ -393,15 +393,15 @@ app.delete('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMI
 //-------------------------------------PEDIDOS---------------------------------------------------------------------------
 
 //Crear pedido
-app.post('/pedidos/crear', async (req, res) => {
+app.post('/pedidos/crear', asyncHandler (async(req, res) => {
   
   try {
       //Crear y guardar el pedido
       const guardarPedido = await Pedido.create (req.body, {w:1}, { returning: true});
       
       //Recorro todos los productos en req.productos
-      
       req.body.productos.forEach(async(item) => {
+      
         //Buscar el producto con el Id que dieron y asegurarme si existe. Si no, responder con status 400.
         const producto = await Producto.findByPk(item.id);
         // if(!producto) throw new Error("Este producto no existe");
@@ -413,20 +413,20 @@ app.post('/pedidos/crear', async (req, res) => {
           cantidad: item.cantidad,
           precio: item.precio
         }
+
         //Crear y guardar un pedidoProducto
         guardarPedidoProducto = await Pedidos_Producto.create(pedidoProducto, { w:1 }, {returning:true});
         if(!guardarPedidoProducto) throw new Error("No se pudo guardar en la tabla de pedidos_producto");
 
       });
-      console.log("sali del foreach")
    
-      if (!guardarPedido)   throw new Error(`No fue posible guardar el producto ${item.id} en le pedido ${pedidoProducto.pedidoId}`);
+      if (!guardarPedido) throw new Error(`No fue posible guardar el producto ${item.id} en el pedido ${pedidoProducto.pedidoId}`);
       
       return res.status(200).json(guardarPedido);
       
   } catch (e) { console.log(e); }
   
-});
+}));
 
 // //Get obtenemos toda la informacion de Pedidos y productos
 
@@ -437,11 +437,11 @@ app.get('/pedidos', asyncHandler (async (req, res) => {
     
     //Asegurarse de incluir los productos
     include: [{
-      model: Pedido,
-      as: 'pedidos',
+      model: Producto,
+      as: 'productos',
       required: false,
-      //Pasar los atributos del produto que deseo traer
-      attributes: [  'id', 'fecha','tipo_pago', 'estado' ],
+      //Pasar los atributos del producto que deseo traer
+      attributes: [  'id', 'nombreProducto','imagen', 'precio' ],
       through: {
         //El codigo a continuacion, trae las propiedades de la tabla de union
         model: Pedidos_Producto,
@@ -450,33 +450,12 @@ app.get('/pedidos', asyncHandler (async (req, res) => {
       }
     }]
   });
-
+  console.log(todoPedidos)
    //Si todo esta bien
-   return respondWith(res, 200, ['Returning all orders'], {todoPedidos});
+   return res.status(200).json(todoPedidos);
 }));
 
-
-  // sequelize.authenticate().then(async () => {
-
-  //   const query = `SELECT * FROM pedidos JOIN pedidos_productos
-  //    ON pedidos.id = pedidos_productos.pedidoId JOIN productos 
-  //    ON pedidos_productos.productoId = productos.id 
-  //    ORDER BY pedidos.id ASC`;
-  //   const [resultados] =  await sequelize.query(query, { raw: true })
-  //   console.log(resultados);
-  //   res.json(resultados);    
-
-  // })
-  // .catch(err => {
-  //   console.error('Unable to connect to the database:', err);
-  // });
-
-// });
-
 //Actualizar Estado de pedidos
-
-//Put, actualizar pedido por id
-
 app.put('/productos/:indicePedido', function(req, res) {
 
   const indicePedidos = req.params.indicePedido;
