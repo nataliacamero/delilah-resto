@@ -9,17 +9,7 @@ const ROLES = {
     }
 const asyncHandler = require('express-async-handler');
   
-
-// const token = jwt.sign(informacionUsuario, firma);
-// console.log("token codificado: " , token);
-// const descodificado = jwt.verify(token, firma);
-// console.log("token descodificado: ", descodificado);
-// const validacion = require('./validacion');
-// const validacionUsuarioContrasena = validacion.validarAutenticacion;
-
-
-
-
+//Cofiguracion del servidor
 
 app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
 
@@ -100,11 +90,9 @@ const Pedido = sequelize.define('pedido',{
 
 const Pedidos_Producto = sequelize.define('pedidos_producto', {
   cantidad: Sequelize.INTEGER,
-  precio: Sequelize.INTEGER
-  
 });
-//Relacion uno a muchos Usuarios-Pedido
 
+//Relacion uno a muchos Usuarios-Pedido
 Usuario.hasMany(Pedido);
 
 
@@ -122,6 +110,8 @@ Pedido.belongsToMany(Producto, { through: Pedidos_Producto, as: 'productos', for
 
 //Routes
 app.use(express.json());
+app.use(express.urlencoded({extended:false}));
+
 
 
 //Bienvenida
@@ -316,9 +306,9 @@ app.delete('/usuarios/:indiceUsuario', autenticarUsuario, authRole(ROLES.ADMIN),
   });
 });
 
-//-------------------------Producto---------------------------------------------------
+//-------------------------Productos---------------------------------------------------
 
-//Get Producto
+//Get Productos
 
 app.get('/productos', autenticarUsuario, (req, res) => {
 
@@ -368,13 +358,13 @@ app.post('/productos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, r
 app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
 
   const indiceProductos = req.params.indiceProductos;
-  Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
-    nombre.update({
+  Productos.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
+    actualizacionProducto.update({
       nombreProducto: req.body.nombre,
       imagen: req.body.imagen,
       precio: req.body.precio
-  }).then((nombre) => {
-      res.json(nombre);
+  }).then((actualizacionProducto) => {
+      res.json(actualizacionProducto);
     });
   });
 });
@@ -383,9 +373,9 @@ app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN),
 
 app.delete('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   const indiceProductos = req.params.indiceProductos;
-    Productos.findByPk(req.params.indiceProductos).then(function(nombre) {
-      nombre.destroy();
-    }).then((nombre) => {
+    Productos.findByPk(req.params.indiceProductos).then(function(borrarProducto) {
+      borrarProducto.destroy();
+    }).then((borrarProducto) => {
       res.sendStatus(200);
     });
 });
@@ -393,9 +383,17 @@ app.delete('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMI
 //-------------------------------------PEDIDOS---------------------------------------------------------------------------
 
 //Crear pedido
-app.post('/pedidos/crear', asyncHandler (async(req, res) => {
+app.post('/pedidos/crear', autenticarUsuario, asyncHandler (async(req, res) => {
   
-  try {
+  //Buscar el usuario con el Id que dieron y asegurarme si existe. Si no, responder con error.
+  const usuarioId = await Usuario.findByPk(req.body.usuarioId);
+  
+  if(!usuarioId) {
+    res.json({ error: "El usuario no existe"})
+  } else {
+
+    try {
+    
       //Crear y guardar el pedido
       const guardarPedido = await Pedido.create (req.body, {w:1}, { returning: true});
       
@@ -404,33 +402,55 @@ app.post('/pedidos/crear', asyncHandler (async(req, res) => {
       
         //Buscar el producto con el Id que dieron y asegurarme si existe. Si no, responder con status 400.
         const producto = await Producto.findByPk(item.id);
-        // if(!producto) throw new Error("Este producto no existe");
+        if(!producto) throw new Error("Este producto no existe");
         
         //Creo un diccionario con el cual crear el Pedidos_Producto
         const pedidoProducto = {
           pedidoId: guardarPedido.id,
           productoId: item.id,
           cantidad: item.cantidad,
-          precio: item.precio
         }
-
+  
         //Crear y guardar un pedidoProducto
         guardarPedidoProducto = await Pedidos_Producto.create(pedidoProducto, { w:1 }, {returning:true});
         if(!guardarPedidoProducto) throw new Error("No se pudo guardar en la tabla de pedidos_producto");
-
-      });
-   
-      if (!guardarPedido) throw new Error(`No fue posible guardar el producto ${item.id} en el pedido ${pedidoProducto.pedidoId}`);
-      
-      return res.status(200).json(guardarPedido);
-      
-  } catch (e) { console.log(e); }
   
+      });
+     
+      if (!guardarPedido) throw new Error(`No fue posible guardar el producto ${item.id} en el pedido ${pedidoProducto.pedidoId}`);
+    
+      //Obtener el pedido
+      const pedidoCreado = await Pedido.findByPk((guardarPedido.id), {
+      
+        //Asegurarse de incluir los productos
+          include: [{
+            model: Producto,
+            as: 'productos',
+            required: false,
+            //Pasar los atributos del producto que deseo traer
+            attributes: [  'id', 'nombreProducto','precio' ],
+            through: {
+              //El codigo a continuacion, trae las propiedades de la tabla de union
+              model: Pedidos_Producto,
+              as: 'pedidos_producto',
+              attributes: ['cantidad']
+            }
+          }]
+      });
+
+      //Si todo esta bien
+      return res.status(200).json(pedidoCreado);
+ 
+    } catch (e) { 
+      console.log(e); 
+    }
+  }
+
 }));
 
-// //Get obtenemos toda la informacion de Pedidos y productos
 
-app.get('/pedidos', asyncHandler (async (req, res) => {
+//Get obtenemos toda la informacion de Pedidos y productos
+app.get('/pedidos', autenticarUsuario, asyncHandler (async (req, res) => {
 
   //Obtener todos los pedidos
   const todoPedidos = await Pedido.findAll({
@@ -446,28 +466,80 @@ app.get('/pedidos', asyncHandler (async (req, res) => {
         //El codigo a continuacion, trae las propiedades de la tabla de union
         model: Pedidos_Producto,
         as: 'pedidos_producto',
-        attributes: ['cantidad', 'precio']
+        attributes: ['cantidad']
       }
     }]
   });
-  console.log(todoPedidos)
+  // console.log(todoPedidos)
    //Si todo esta bien
    return res.status(200).json(todoPedidos);
 }));
 
-//Actualizar Estado de pedidos
-app.put('/productos/:indicePedido', function(req, res) {
 
-  const indicePedidos = req.params.indicePedido;
-  Pedido.findByPk(req.params.indicePedido).then(function(nombre) {
-    nombre.update({
-      fecha: req.body.fecha,
-      tipo_pago: req.body.tipo_pago,
-      estado: req.body.estado
-  }).then((nombre) => {
-      res.json(nombre);
+//Get obtenemos pedidos por id
+app.get('/pedidos/:indicePedidos', autenticarUsuario, asyncHandler (async (req, res) => {
+
+    //Obtener el pedido
+    const pedidoPorId = await Pedido.findByPk((req.params.indicePedidos), {
+      
+        //Asegurarse de incluir los productos
+        include: [{
+          model: Producto,
+          as: 'productos',
+          required: false,
+          //Pasar los atributos del producto que deseo traer
+          attributes: [  'id', 'nombreProducto','imagen', 'precio' ],
+          through: {
+            //El codigo a continuacion, trae las propiedades de la tabla de union
+            model: Pedidos_Producto,
+            as: 'pedidos_producto',
+            attributes: ['cantidad']
+          }
+        }]
     });
-  });
+    // console.log(todoPedidos)
+     //Si todo esta bien
+     return res.status(200).json(pedidoPorId);
+
+}));
+
+
+
+//Actualizar estado de pedidos
+app.patch('/pedidos/:indicePedido/actualizar-estado', autenticarUsuario, authRole(ROLES.ADMIN), asyncHandler (async (req, res) => {
+
+
+  //Obtener el pedido de la base de datos
+  const pedido = await Pedido.findByPk(req.params.indicePedido);
+
+  //Actualizar propiedad estado, del pedido
+  if (req.body.estado === "nuevo" || req.body.estado === "confirmado" || req.body.estado === "preparando" || req.body.estado === "enviando" || req.body.estado === "cancelado" || req.body.estado === "entregado" ) {
+    const indicePedido = req.params.indicePedido;
+    Pedido.findByPk(req.params.indicePedido).then(function(estado) {
+      estado.update({
+        estado: req.body.estado,
+    }).then((estado) => {
+        res.status(200).json(estado);
+      });
+    });
+
+  } else {
+    res.status(400).send({ error: 'Algo ha fallado, la propiedad estado del pedido, solo puede contener una de los siguientes valores: nuevo, confirmado, preparando, enviando, cancelado, entregado' });
+  }
+    
+}));
+
+
+
+//Delete Pedido por id
+app.delete('/pedidos/:indicePedidos/borrar-pedido', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+  const indicePedidos = req.params.indicePedidos;
+    Pedido.findByPk(req.params.indicePedidos).then(function(borrarPedido) {
+      borrarPedido.destroy();
+    }).then((borrarPedido) => {
+      res.sendStatus(200);
+    });
 });
+
 
 
