@@ -12,7 +12,7 @@ const ROLES = {
       BASIC: 'usuarioBasico'
     }
 const asyncHandler = require('express-async-handler');
-
+//Configuracion Multer
 const storage = multer.diskStorage({
   destination: path.join(__dirname,'uploads/'), 
   filename:(req, file, cb) => {
@@ -447,27 +447,10 @@ app.post('/pedidos/crear', autenticarUsuario, asyncHandler (async(req, res) => {
      
       if (!guardarPedido) throw new Error(`No fue posible guardar el producto ${item.id} en el pedido ${pedidoProducto.pedidoId}`);
     
-      //Obtener el pedido
-      const pedidoCreado = await Pedido.findByPk((guardarPedido.id), {
-      
-        //Asegurarse de incluir los productos
-          include: [{
-            model: Producto,
-            as: 'productos',
-            required: false,
-            //Pasar los atributos del producto que deseo traer
-            attributes: [  'id', 'nombreProducto','precio' ],
-            through: {
-              //El codigo a continuacion, trae las propiedades de la tabla de union
-              model: Pedidos_Producto,
-              as: 'pedidos_producto',
-              attributes: ['cantidad']
-            }
-          }]
-      });
+
 
       //Si todo esta bien
-      return res.status(200).json(pedidoCreado);
+      return res.status(200).json(guardarPedido);
  
     } catch (e) { 
       console.log(e); 
@@ -514,7 +497,7 @@ app.get('/pedidos/:indicePedidos', autenticarUsuario, asyncHandler (async (req, 
       include: [{
         model: Producto,
         as: 'productos',
-        required: false,
+        required: true,
         //Pasar los atributos del producto que deseo traer
         attributes: [  'id', 'nombreProducto','imagen', 'precio' ],
         through: {
