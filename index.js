@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const multer = require('multer');
+const upload = multer({ dest:'uploads/' })
 
 const jwt = require('jsonwebtoken')
 const informacionUsuario = { nombre : 'Natalia'}
@@ -361,6 +362,7 @@ app.get('/productos/:indiceProductos', autenticarUsuario, (req, res) => {
 //Post, crear productos
 
 app.post('/productos/crear', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+  console.log(req.file)
   Productos.create({ nombreProducto: req.body.nombre, imagen: req.body.imagen, precio: req.body.precio }).then(function(nombre) {
     res.json(nombre);
   });
