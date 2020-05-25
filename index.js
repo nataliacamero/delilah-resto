@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const multer = require('multer');
-const upload = multer({ dest:'uploads/' })
+const path = require('path');
+const uuid = require("uuid")
 
 const jwt = require('jsonwebtoken')
 const informacionUsuario = { nombre : 'Natalia'}
@@ -12,7 +13,13 @@ const ROLES = {
     }
 const asyncHandler = require('express-async-handler');
 
-  
+const storage = multer.diskStorage({
+  destination: path.join(__dirname,'uploads/'), 
+  filename:(req, file, cb) => {
+    cb(null, uuid.v4() + path.extname(file.originalname));
+  }
+});
+
 //Cofiguracion del servidor
 
 app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
@@ -112,11 +119,17 @@ Pedido.belongsToMany(Producto, { through: Pedidos_Producto, as: 'productos', for
 
 
 
-//Routes
+//Middlewares
+
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
+app.use(multer({
+  storage,
+  dest: path.join(__dirname,'uploads/')
+}).single('image'));
 
 
+//Routes
 
 //Bienvenida
 app.get('/', (req, res) => res.send('Delilah Restó App'));
@@ -359,11 +372,11 @@ app.get('/productos/:indiceProductos', autenticarUsuario, (req, res) => {
 });
 
 
-//Post, crear productos
+//Post, crear productos. Debe enviarse por formulario
 
-app.post('/productos/crear', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+app.post('/productos/crear', autenticarUsuario, authRole(ROLES.ADMIN),function(req, res) {
   console.log(req.file)
-  Productos.create({ nombreProducto: req.body.nombre, imagen: req.body.imagen, precio: req.body.precio }).then(function(nombre) {
+  Producto.create({ nombreProducto: req.body.nombreProducto, imagen: req.file.path, precio: req.body.precio }).then(function(nombre) {
     res.json(nombre);
   });
 });
