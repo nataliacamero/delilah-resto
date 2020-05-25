@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+const multer = require('multer');
+
 const jwt = require('jsonwebtoken')
 const informacionUsuario = { nombre : 'Natalia'}
 const firma = 'MateitoGusi123'
@@ -8,6 +10,7 @@ const ROLES = {
       BASIC: 'usuarioBasico'
     }
 const asyncHandler = require('express-async-handler');
+
   
 //Cofiguracion del servidor
 
@@ -128,13 +131,14 @@ app.post('/login', (req, res) => {
 
   sequelize.authenticate().then(async () => {
     let {nombreUsuario, password} = req.body;
-    const query = `SELECT nombre,nombreUsuario,password,rol FROM Delilah_Resto.usuarios WHERE nombreUsuario = ${JSON.stringify(nombreUsuario)} AND password = ${JSON.stringify(password)};`;
+    const query = `SELECT id,nombre,nombreUsuario,password,rol FROM Delilah_Resto.usuarios WHERE nombreUsuario = ${JSON.stringify(nombreUsuario)} AND password = ${JSON.stringify(password)};`;
     const [resultados] =  await sequelize.query(query, { raw: true })
     console.log(resultados);
     if (resultados.length > 0) {
-      const token = jwt.sign({nombre: resultados[0].nombre, password: password, rol: resultados[0].rol}, firma);
+      const token = jwt.sign({id: resultados[0].id, nombre: resultados[0].nombre, password: password, rol: resultados[0].rol}, firma);
       res.json(token);
       console.log(token)
+      console.log("Linea 115: ", resultados[0].id);
       console.log("Linea 115: ", resultados[0].nombre);
       console.log("Linea 116: ", resultados[0].password);
       console.log("Linea 117: ", resultados[0].rol);
@@ -193,7 +197,35 @@ function authRole(role) {
 
 //-------------------------Usuarios---------------------------------------------------
 
-//Get Usuarios
+//Post, opcion para CREAR una nueva cuenta USUARIO, valída en bd si ya existe el nombreUsuario si no, se crea por defecto con rol de usuarioBasico.
+
+app.post('/usuarios/crear', function(req, res) {
+
+  sequelize.authenticate().then(async () => {
+      
+    const query = `SELECT nombreUsuario FROM usuarios WHERE nombreUsuario = ${JSON.stringify(req.body.nombreUsuario)}` 
+    const [resultados] = await sequelize.query(query, { raw: true });
+
+    console.log(resultados);
+
+    if(resultados.length > 0 ){
+      res.send('El usuario ya existe en la base de datos');
+    } else {
+      Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: ROLES.BASIC }).then(function(nombre) {
+        res.json(nombre);
+        console.log("Usuario creado")
+      });
+    }
+  
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+
+  
+});
+
+//Get Usuarios 
 
 app.get('/usuarios', autenticarUsuario, authRole(ROLES.ADMIN), (req, res) => {
   
@@ -244,40 +276,14 @@ app.get('/usuarios/:indiceUsuarios', autenticarUsuario, (req, res) => {
 
 });
 
-//Post, opcion para crear una nueva cuenta USUARIO, valida en bd si ya existe el nombreUsuario si no, se crea por defecto con rol de usuarioBasico.
 
-app.post('/usuarios', function(req, res) {
-
-  sequelize.authenticate().then(async () => {
-      
-    const query = `SELECT nombreUsuario FROM usuarios WHERE nombreUsuario = ${JSON.stringify(req.body.nombreUsuario)}` 
-    const [resultados] = await sequelize.query(query, { raw: true });
-
-    console.log(resultados);
-
-    if(resultados.length > 0 ){
-      res.send('El usuario ya existe en la base de datos');
-    } else {
-      Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: ROLES.BASIC }).then(function(nombre) {
-        res.json(nombre);
-        console.log("Usuario creado")
-      });
-    }
-  
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-
-  
-});
 
 //Put, actualizar USUARIO por id
 
-app.put('/usuarios/:indiceUsuario', autenticarUsuario, function(req, res) {
+app.put('/usuarios/:indiceUsuario/actualizar-usuario', autenticarUsuario, function(req, res) {
 
   const indiceUsuario = req.params.indiceUsuario;
-  Usuarios.findByPk(req.params.indiceUsuario).then(function(nombre) {
+  Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
     nombre.update({
       nombre: req.body.nombre,
       apellido: req.body.apellido,
@@ -288,7 +294,14 @@ app.put('/usuarios/:indiceUsuario', autenticarUsuario, function(req, res) {
       password: req.body.password,
       rol: ROLES.BASIC
   }).then((nombre) => {
-      res.json(nombre);
+    
+    //Validacion de usuario autorizado
+    if(req.usuario.id.toString() === indiceUsuario.toString() || req.usuario.rol === ROLES.ADMIN ){
+      return res.status(200).json(nombre);
+    } else {
+      res.send('No es permitido el acceso a este recurso.')
+    }
+      
     });
   });
 });
@@ -297,9 +310,9 @@ app.put('/usuarios/:indiceUsuario', autenticarUsuario, function(req, res) {
 
 //Delete, borrar USUARIO por id
 
-app.delete('/usuarios/:indiceUsuario', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+app.delete('/usuarios/:indiceUsuario/borrar-usuario', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   const indiceUsuario = req.params.indiceUsuario;
-  Usuarios.findByPk(req.params.indiceUsuario).then(function(nombre) {
+  Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
     nombre.destroy();
   }).then((nombre) => {
     res.sendStatus(200);
@@ -308,7 +321,7 @@ app.delete('/usuarios/:indiceUsuario', autenticarUsuario, authRole(ROLES.ADMIN),
 
 //-------------------------Productos---------------------------------------------------
 
-//Get Productos
+//Get Productos, puede listar todos los productos disponibles.
 
 app.get('/productos', autenticarUsuario, (req, res) => {
 
@@ -347,7 +360,7 @@ app.get('/productos/:indiceProductos', autenticarUsuario, (req, res) => {
 
 //Post, crear productos
 
-app.post('/productos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+app.post('/productos/crear', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   Productos.create({ nombreProducto: req.body.nombre, imagen: req.body.imagen, precio: req.body.precio }).then(function(nombre) {
     res.json(nombre);
   });
@@ -355,7 +368,7 @@ app.post('/productos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, r
 
 //Put, actualizar producto por id
 
-app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+app.put('/productos/:indiceProductos/actualizar-producto', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
 
   const indiceProductos = req.params.indiceProductos;
   Productos.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
@@ -371,7 +384,7 @@ app.put('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN),
 
 //Delete, borrar producto por id
 
-app.delete('/productos/:indiceProductos', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
+app.delete('/productos/:indiceProductos/borrar-producto', autenticarUsuario, authRole(ROLES.ADMIN), function(req, res) {
   const indiceProductos = req.params.indiceProductos;
     Productos.findByPk(req.params.indiceProductos).then(function(borrarProducto) {
       borrarProducto.destroy();
@@ -449,8 +462,8 @@ app.post('/pedidos/crear', autenticarUsuario, asyncHandler (async(req, res) => {
 }));
 
 
-//Get obtenemos toda la informacion de Pedidos y productos
-app.get('/pedidos', autenticarUsuario, asyncHandler (async (req, res) => {
+//Get obtenemos toda la informacion de Pedidos y productos. Solo para el usuario Administrador.
+app.get('/pedidos', autenticarUsuario, authRole(ROLES.ADMIN), asyncHandler (async (req, res) => {
 
   //Obtener todos los pedidos
   const todoPedidos = await Pedido.findAll({
@@ -470,63 +483,93 @@ app.get('/pedidos', autenticarUsuario, asyncHandler (async (req, res) => {
       }
     }]
   });
-  // console.log(todoPedidos)
+
    //Si todo esta bien
    return res.status(200).json(todoPedidos);
 }));
 
 
-//Get obtenemos pedidos por id
+//Get obtenemos pedidos por id, solo para usuario Basico
 app.get('/pedidos/:indicePedidos', autenticarUsuario, asyncHandler (async (req, res) => {
 
-    //Obtener el pedido
-    const pedidoPorId = await Pedido.findByPk((req.params.indicePedidos), {
-      
-        //Asegurarse de incluir los productos
-        include: [{
-          model: Producto,
-          as: 'productos',
-          required: false,
-          //Pasar los atributos del producto que deseo traer
-          attributes: [  'id', 'nombreProducto','imagen', 'precio' ],
-          through: {
-            //El codigo a continuacion, trae las propiedades de la tabla de union
-            model: Pedidos_Producto,
-            as: 'pedidos_producto',
-            attributes: ['cantidad']
-          }
-        }]
-    });
-    // console.log(todoPedidos)
-     //Si todo esta bien
-     return res.status(200).json(pedidoPorId);
-
+  //Obtener el pedido
+  const pedidoPorId = await Pedido.findByPk((req.params.indicePedidos), {
+    
+      //Asegurarse de incluir los productos
+      include: [{
+        model: Producto,
+        as: 'productos',
+        required: false,
+        //Pasar los atributos del producto que deseo traer
+        attributes: [  'id', 'nombreProducto','imagen', 'precio' ],
+        through: {
+          //El codigo a continuacion, trae las propiedades de la tabla de union
+          model: Pedidos_Producto,
+          as: 'pedidos_producto',
+          attributes: ['cantidad']
+        }
+      }]
+  });
+  console.log(pedidoPorId);
+  //Validacion de usuario autorizado
+    if(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === ROLES.ADMIN ){
+    console.log("estoy validando")
+    return res.status(200).json(pedidoPorId);
+  } else {
+    res.send('No es permitido el acceso a este recurso.')
+  }
+  
 }));
 
 
 
-//Actualizar estado de pedidos
+//Actualizar / Editar pedidos.
 app.patch('/pedidos/:indicePedido/actualizar-estado', autenticarUsuario, authRole(ROLES.ADMIN), asyncHandler (async (req, res) => {
 
-
-  //Obtener el pedido de la base de datos
-  const pedido = await Pedido.findByPk(req.params.indicePedido);
-
-  //Actualizar propiedad estado, del pedido
+  //Validamos si el valor enviado para modificar el  estado del pedido, se encuentra entre los valores permitidos.
   if (req.body.estado === "nuevo" || req.body.estado === "confirmado" || req.body.estado === "preparando" || req.body.estado === "enviando" || req.body.estado === "cancelado" || req.body.estado === "entregado" ) {
-    const indicePedido = req.params.indicePedido;
-    Pedido.findByPk(req.params.indicePedido).then(function(estado) {
-      estado.update({
-        estado: req.body.estado,
-    }).then((estado) => {
-        res.status(200).json(estado);
-      });
+    
+    // Obtenemos el pedido de la BD
+    const pedido = await Pedido.findByPk(req.params.indicePedido);
+    pedido.update({
+      fecha: req.body.fecha,
+      tipo_pago: req.body.tipo_pago,
+      estado: req.body.estado,
+      usuarioId: req.body.usuarioId
     });
+    
+
+    // Quitamos las asociaciones de pedidos y productos
+    const productos = await pedido.getProductos();
+    console.log("PRODUCTOS", productos)
+    
+    pedido.removeProductos(productos);
+    console.log("PEDIDO DESPUES DE REMOVER PRODCTOS", productos, pedido)
+
+    // Recorremos el arreglo del request para modificar pedidos_producto
+    req.body.productos.forEach(async (item) => {
+      console.log(item.pedidos_producto.cantidad);
+        
+      // Creamos un diccionario para crear pedidos_producto 
+      const pp = {
+        pedidoId: pedido.id,
+        productoId: item.id,
+        cantidad: item.pedidos_producto.cantidad
+      };
+
+      // Crear y guardar pedidos_producto
+      const guardarPedidoProducto = await Pedidos_Producto.create(pp, { w: 1 }, { returning: true });
+      console.log("guardarPedidoProduccto",guardarPedidoProducto);
+    });
+
+    console.log("sali del foreach");
+    
+    return res.status(200).json(pedido);
 
   } else {
     res.status(400).send({ error: 'Algo ha fallado, la propiedad estado del pedido, solo puede contener una de los siguientes valores: nuevo, confirmado, preparando, enviando, cancelado, entregado' });
   }
-    
+
 }));
 
 
