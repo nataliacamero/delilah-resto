@@ -2,8 +2,6 @@ const { Router } = require('express');
 
 const router = Router();
 
-
-
 const ROLES = {
       ADMIN: 'Administrador',
       BASIC: 'usuarioBasico'
