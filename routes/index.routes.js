@@ -1,11 +1,14 @@
 const { Router } = require('express');
-
 const router = Router();
-
+const jwt = require('jsonwebtoken');
+const informacionUsuario = { nombre : 'Natalia'};
+const firma = 'MateitoGusi123';
 const ROLES = {
       ADMIN: 'Administrador',
       BASIC: 'usuarioBasico'
-    }
+    };
+
+const funciones = require('../funciones');//Funciones propias
 
 const asyncHandler = require('express-async-handler');
 
@@ -13,93 +16,92 @@ const asyncHandler = require('express-async-handler');
 //Configuracion Base de datos
 
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto');
+const sequelize = require('../data/db-conexion');
 
 
 //Creando tabla Producto
 
 const Producto = sequelize.define('producto',{
-    nombreProducto: Sequelize.STRING,
-    imagen: Sequelize.STRING,
-    precio: Sequelize.INTEGER
-  });
+  nombreProducto: Sequelize.STRING,
+  imagen: Sequelize.STRING,
+  precio: Sequelize.INTEGER
+});
+
+sequelize.sync({ force: true }).then(() => {
+    console.log(`Database & tables created!`);
+
+    Producto.bulkCreate([
+      { nombreProducto: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
+      { nombreProducto: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
+      { nombreProducto: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
+      { nombreProducto: 'Hamburguesa de Cerdo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 40000 },
+      { nombreProducto: 'Hamburguesa de aguacate', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 50000 },
+      { nombreProducto: 'Coca cola', imagen: 'SOY LA IMAGEN DE LA cocacola', precio: 5000 },
+      { nombreProducto: 'Agua', imagen: 'SOY LA IMAGEN DEL AGUA', precio: 3000 },
+      { nombreProducto: 'Limonada de Mango', imagen: 'SOY LA IMAGEN DE LA LIMONADA DE MANGO', precio: 9000 },
+      { nombreProducto: 'Limonada', imagen: 'SOY LA IMAGEN DE LA LIMONADA', precio: 5000 },
+      { nombreProducto: 'Cafe', imagen: 'SOY LA IMAGEN DEL CAFE', precio: 8000 }
+
+    ]).then(function() {
+      
+      return Producto.findAll();
+    }).then(function(Producto) {
+      // console.log(Producto);
+    });
+});
+
   
-  sequelize.sync({ force: true }).then(() => {
-      console.log(`Database & tables created!`);
+//Creando tabla USUARIOS
+
+const Usuario = sequelize.define('usuario',{
+  nombre: Sequelize.STRING,
+  apellido: Sequelize.STRING,
+  email: Sequelize.STRING,
+  telefono: Sequelize.STRING,
+  direccioEnvio: Sequelize.STRING,
+  nombreUsuario: Sequelize.STRING,
+  password: Sequelize.STRING,
+  rol: Sequelize.STRING
+});
   
-      Producto.bulkCreate([
-        { nombreProducto: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
-        { nombreProducto: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
-        { nombreProducto: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
-        { nombreProducto: 'Hamburguesa de Cerdo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 40000 },
-        { nombreProducto: 'Hamburguesa de aguacate', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 50000 },
-        { nombreProducto: 'Coca cola', imagen: 'SOY LA IMAGEN DE LA cocacola', precio: 5000 },
-        { nombreProducto: 'Agua', imagen: 'SOY LA IMAGEN DEL AGUA', precio: 3000 },
-        { nombreProducto: 'Limonada de Mango', imagen: 'SOY LA IMAGEN DE LA LIMONADA DE MANGO', precio: 9000 },
-        { nombreProducto: 'Limonada', imagen: 'SOY LA IMAGEN DE LA LIMONADA', precio: 5000 },
-        { nombreProducto: 'Cafe', imagen: 'SOY LA IMAGEN DEL CAFE', precio: 8000 }
+sequelize.sync({ force: true }).then(() => {
+    console.log(`Database & tables created!`);
+
+    Usuario.bulkCreate([
+      { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "nataliacameroc@gmail.com", password: "KJUBHYAS&&%TUGYGYJ", rol: "Administrador" },
+      { nombre: 'Camilo', apellido: "Barrera", email:"camilobarrera@gmail.com", telefono: "3023445566", direccioEnvio:"Calle 1 # 56 99", nombreUsuario: "camilobarrera@gmail.com", password: "jg76ertwygbdsfy", rol: "usuarioBasico" },
+      { nombre: 'Andres', apellido: "Ayala", email:"andresayala@gmail.com", telefono: "3036775477", direccioEnvio:"Carrera 45 # 8 67", nombreUsuario: "andresayala@gmail.com", password: "srfnw7ryiwhfjksdh", rol: "usuarioBasico" },
+      { nombre: 'Gustavo', apellido: "Maggi", email:"gustavomaggi@gmail.com", telefono: "3057634387", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "gustavomaggi@gmail.com", password: "jhgf77tqwyxnfjd", rol: "usuarioBasico" },
+    ]).then(function() {
+      
+      return Usuario.findAll();
+    }).then(function(usuario) {
+      // console.log(usuarios);
+    });
+});
+
+
+//Creando Tabla Pedido
   
-      ]).then(function() {
-        
-        return Producto.findAll();
-      }).then(function(Producto) {
-        // console.log(Producto);
-      });
-  });
+const Pedido = sequelize.define('pedido',{
+  fecha: Sequelize.DATE,
+  tipo_pago: Sequelize.STRING,
+  estado: Sequelize.STRING
+});
   
-  
-  //Creando tabla USUARIOS
-  
-  const Usuario = sequelize.define('usuario',{
-    nombre: Sequelize.STRING,
-    apellido: Sequelize.STRING,
-    email: Sequelize.STRING,
-    telefono: Sequelize.STRING,
-    direccioEnvio: Sequelize.STRING,
-    nombreUsuario: Sequelize.STRING,
-    password: Sequelize.STRING,
-    rol: Sequelize.STRING
-  });
-  
-  sequelize.sync({ force: true }).then(() => {
-      console.log(`Database & tables created!`);
-  
-      Usuario.bulkCreate([
-        { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "nataliacameroc@gmail.com", password: "KJUBHYAS&&%TUGYGYJ", rol: "Administrador" },
-        { nombre: 'Camilo', apellido: "Barrera", email:"camilobarrera@gmail.com", telefono: "3023445566", direccioEnvio:"Calle 1 # 56 99", nombreUsuario: "camilobarrera@gmail.com", password: "jg76ertwygbdsfy", rol: "usuarioBasico" },
-        { nombre: 'Andres', apellido: "Ayala", email:"andresayala@gmail.com", telefono: "3036775477", direccioEnvio:"Carrera 45 # 8 67", nombreUsuario: "andresayala@gmail.com", password: "srfnw7ryiwhfjksdh", rol: "usuarioBasico" },
-        { nombre: 'Gustavo', apellido: "Maggi", email:"gustavomaggi@gmail.com", telefono: "3057634387", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "gustavomaggi@gmail.com", password: "jhgf77tqwyxnfjd", rol: "usuarioBasico" },
-      ]).then(function() {
-        
-        return Usuario.findAll();
-      }).then(function(usuario) {
-        // console.log(usuarios);
-      });
-  });
-  
-  
-  //Creando Tabla Pedido
-  
-  const Pedido = sequelize.define('pedido',{
-    fecha: Sequelize.DATE,
-    tipo_pago: Sequelize.STRING,
-    estado: Sequelize.STRING
-  });
-  
-  const Pedidos_Producto = sequelize.define('pedidos_producto', {
-    cantidad: Sequelize.INTEGER,
-  });
-  
-  //Relacion uno a muchos Usuarios-Pedido
-  Usuario.hasMany(Pedido);
-  
-  
-  //Relacion Muchos a Muchos Pedido-Producto
-  
-  Producto.belongsToMany(Pedido, { through: Pedidos_Producto, as:'pedidos', foreignKey: 'prouctoId', otherKey: 'pedidoId' });
-  Pedido.belongsToMany(Producto, { through: Pedidos_Producto, as: 'productos', foreignKey: 'pedidoId', otherKey: 'productoId' });
-  
-  
+const Pedidos_Producto = sequelize.define('pedidos_producto', {
+  cantidad: Sequelize.INTEGER,
+});
+
+//Relacion uno a muchos Usuarios-Pedido
+Usuario.hasMany(Pedido);
+
+
+//Relacion Muchos a Muchos Pedido-Producto
+Producto.belongsToMany(Pedido, { through: Pedidos_Producto, as:'pedidos', foreignKey: 'prouctoId', otherKey: 'pedidoId' });
+Pedido.belongsToMany(Producto, { through: Pedidos_Producto, as: 'productos', foreignKey: 'pedidoId', otherKey: 'productoId' });
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
 
@@ -125,13 +127,14 @@ router.post('/login', (req, res) => {
     const [resultados] =  await sequelize.query(query, { raw: true })
     console.log(resultados);
     if (resultados.length > 0) {
-      const token = jwt.sign({id: resultados[0].id, nombre: resultados[0].nombre, password: password, rol: resultados[0].rol}, firma);
+      const token = jwt.sign({id: resultados[0].id, nombre: resultados[0].nombre, nombreUsuario: resultados[0].nombreUsuario, password: password, rol: resultados[0].rol}, firma);
       res.json(token);
       console.log(token)
-      console.log("Linea 115: ", resultados[0].id);
-      console.log("Linea 115: ", resultados[0].nombre);
-      console.log("Linea 116: ", resultados[0].password);
-      console.log("Linea 117: ", resultados[0].rol);
+      console.log("Linea 133: ", resultados[0].id);
+      console.log("Linea 134: ", resultados[0].nombre);
+      console.log("Linea 135: ", resultados[0].nombreUsuario);
+      console.log("Linea 136: ", resultados[0].password);
+      console.log("Linea 137: ", resultados[0].rol);
       return
     } else {
       res.json({ error: "Usuario o contraseña incorrecta."});
@@ -142,8 +145,6 @@ router.post('/login', (req, res) => {
 
 
 //Metodo Seguro
-
-
 
 router.post('/seguro', (req,res) => {
 res.send(`Esta es una página autenticada. Hola ${req.usuario.nombre}. Tu rol es ${req.usuario.rol}`)
@@ -181,7 +182,7 @@ router.post('/usuarios/crear', function(req, res) {
     if(resultados.length > 0 ){
       res.send('El usuario ya existe en la base de datos');
     } else {
-      Usuarios.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: ROLES.BASIC }).then(function(nombre) {
+      Usuario.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: ROLES.BASIC }).then(function(nombre) {
         res.json(nombre);
         console.log("Usuario creado")
       });
@@ -222,21 +223,16 @@ router.get('/usuarios/:indiceUsuarios', (req, res) => {
   sequelize.authenticate().then(async () => {
     
     const indiceUsuarios = req.params.indiceUsuarios;
-    const queryIdUsuario = `SELECT id FROM usuarios WHERE id = ${indiceUsuarios}` 
-    const query = `SELECT * FROM usuarios WHERE id = ${indiceUsuarios}`;
-    const [idResults] = await sequelize.query(queryIdUsuario, { raw: true });
-    const [resultados] = await sequelize.query(query, { raw: true });
+    const verificarToken = funciones.verificarToken(req.headers.authorization);
+    console.log("Rol", verificarToken.rol === ROLES.ADMIN);
+    console.log(indiceUsuarios === verificarToken.toString());
 
-    console.log(typeof indiceUsuarios);
-    console.log("Linea 210: ", idResults[0].id.toString());
-    console.log(indiceUsuarios === idResults[0].id.toString());
-    console.log(resultados);
 
-    if(indiceUsuarios === idResults[0].id.toString()){
+    if(indiceUsuarios === verificarToken.id.toString() || verificarToken.rol === ROLES.ADMIN){
       console.log("estoy validando")
       res.json(resultados);
     } else {
-      res.send('No es permitido el acceso a este recurso.')
+      res.send('No es permitido el acceso a este recurso.');
     }
   
   })

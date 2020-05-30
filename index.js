@@ -5,7 +5,9 @@ const path = require('path');
 const uuid = require("uuid")
 const jwt = require('jsonwebtoken')
 const informacionUsuario = { nombre : 'Natalia'}
-const firma = 'MateitoGusi123'
+const firma = 'MateitoGusi123';
+const funciones = require('./funciones');
+
 
 //Cofiguracion del servidor
 
@@ -14,7 +16,8 @@ app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
 //Configuracion Base de datos
 
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto');
+const sequelize = require('./data/db-conexion');
+
 
 
 //Configuracion Multer
@@ -38,13 +41,11 @@ const autenticarUsuario = (req, res, next) => {
     try{
       console.log("Linea 140: ",req.headers.authorization);
       console.log("Linea 141: ",req.headers.authorization.split(' ')[1]);
-      const token = req.headers.authorization.split(' ')[1];
-      console.log(token);
-      const verificarToken = jwt.verify(token, firma);
+      const verificarToken = funciones.verificarToken(req.headers.authorization)
       console.log("verificando",verificarToken)
       if(verificarToken){
         req.usuario = verificarToken;
-        return next();
+        return next();s
       }
     } catch(error) {
       res.json({ error: "Error al validar el usuario."})
@@ -67,4 +68,7 @@ app.use(autenticarUsuario);
 
 //Routes
 app.use(require('./routes/index.routes'))
+
+
+module.exports = {autenticarUsuario};
 
