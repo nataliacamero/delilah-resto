@@ -3,107 +3,17 @@ const router = Router();
 const jwt = require('jsonwebtoken');
 const informacionUsuario = { nombre : 'Natalia'};
 const firma = 'MateitoGusi123';
-const ROLES = {
-      ADMIN: 'Administrador',
-      BASIC: 'usuarioBasico'
-    };
-
 const funciones = require('../funciones');//Funciones propias
-
 const asyncHandler = require('express-async-handler');
-
-
-//Configuracion Base de datos
-
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize');//Configuracion Base de datos
 const sequelize = require('../data/db-conexion');
+const {crearTablas, modelos, roles} = require("../data/db");
+const {Producto, Usuario, Pedido, Pedidos_Producto} = modelos;
 
 
-//Creando tabla Producto
-
-const Producto = sequelize.define('producto',{
-  nombreProducto: Sequelize.STRING,
-  imagen: Sequelize.STRING,
-  precio: Sequelize.INTEGER
+crearTablas().then(_=>{
+  console.log("Tablas Creadas");
 });
-
-sequelize.sync({ force: true }).then(() => {
-    console.log(`Database & tables created!`);
-
-    Producto.bulkCreate([
-      { nombreProducto: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
-      { nombreProducto: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
-      { nombreProducto: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
-      { nombreProducto: 'Hamburguesa de Cerdo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 40000 },
-      { nombreProducto: 'Hamburguesa de aguacate', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 50000 },
-      { nombreProducto: 'Coca cola', imagen: 'SOY LA IMAGEN DE LA cocacola', precio: 5000 },
-      { nombreProducto: 'Agua', imagen: 'SOY LA IMAGEN DEL AGUA', precio: 3000 },
-      { nombreProducto: 'Limonada de Mango', imagen: 'SOY LA IMAGEN DE LA LIMONADA DE MANGO', precio: 9000 },
-      { nombreProducto: 'Limonada', imagen: 'SOY LA IMAGEN DE LA LIMONADA', precio: 5000 },
-      { nombreProducto: 'Cafe', imagen: 'SOY LA IMAGEN DEL CAFE', precio: 8000 }
-
-    ]).then(function() {
-      
-      return Producto.findAll();
-    }).then(function(Producto) {
-      // console.log(Producto);
-    });
-});
-
-  
-//Creando tabla USUARIOS
-
-const Usuario = sequelize.define('usuario',{
-  nombre: Sequelize.STRING,
-  apellido: Sequelize.STRING,
-  email: Sequelize.STRING,
-  telefono: Sequelize.STRING,
-  direccioEnvio: Sequelize.STRING,
-  nombreUsuario: Sequelize.STRING,
-  password: Sequelize.STRING,
-  rol: Sequelize.STRING
-});
-  
-sequelize.sync({ force: true }).then(() => {
-    console.log(`Database & tables created!`);
-
-    Usuario.bulkCreate([
-      { nombre: 'Natalia', apellido: "Camero", email:"nataliacameroc@gmail.com", telefono: "3013606833", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "nataliacameroc@gmail.com", password: "KJUBHYAS&&%TUGYGYJ", rol: "Administrador" },
-      { nombre: 'Camilo', apellido: "Barrera", email:"camilobarrera@gmail.com", telefono: "3023445566", direccioEnvio:"Calle 1 # 56 99", nombreUsuario: "camilobarrera@gmail.com", password: "jg76ertwygbdsfy", rol: "usuarioBasico" },
-      { nombre: 'Andres', apellido: "Ayala", email:"andresayala@gmail.com", telefono: "3036775477", direccioEnvio:"Carrera 45 # 8 67", nombreUsuario: "andresayala@gmail.com", password: "srfnw7ryiwhfjksdh", rol: "usuarioBasico" },
-      { nombre: 'Gustavo', apellido: "Maggi", email:"gustavomaggi@gmail.com", telefono: "3057634387", direccioEnvio:"Calle 145 # 46 78", nombreUsuario: "gustavomaggi@gmail.com", password: "jhgf77tqwyxnfjd", rol: "usuarioBasico" },
-    ]).then(function() {
-      
-      return Usuario.findAll();
-    }).then(function(usuario) {
-      // console.log(usuarios);
-    });
-});
-
-
-//Creando Tabla Pedido
-  
-const Pedido = sequelize.define('pedido',{
-  fecha: Sequelize.DATE,
-  tipo_pago: Sequelize.STRING,
-  estado: Sequelize.STRING
-});
-  
-const Pedidos_Producto = sequelize.define('pedidos_producto', {
-  cantidad: Sequelize.INTEGER,
-});
-
-//Relacion uno a muchos Usuarios-Pedido
-Usuario.hasMany(Pedido);
-
-
-//Relacion Muchos a Muchos Pedido-Producto
-Producto.belongsToMany(Pedido, { through: Pedidos_Producto, as:'pedidos', foreignKey: 'prouctoId', otherKey: 'pedidoId' });
-Pedido.belongsToMany(Producto, { through: Pedidos_Producto, as: 'productos', foreignKey: 'pedidoId', otherKey: 'productoId' });
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  
 
 
 
@@ -170,7 +80,7 @@ function authRole(role) {
 
 //Post, opcion para CREAR una nueva cuenta USUARIO, valída en bd si ya existe el nombreUsuario si no, se crea por defecto con rol de usuarioBasico.
 
-router.post('/usuarios/crear', function(req, res) {
+router.post('/usuarios', function(req, res) {
 
   sequelize.authenticate().then(async () => {
       
@@ -182,7 +92,7 @@ router.post('/usuarios/crear', function(req, res) {
     if(resultados.length > 0 ){
       res.send('El usuario ya existe en la base de datos');
     } else {
-      Usuario.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: ROLES.BASIC }).then(function(nombre) {
+      Usuario.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: roles.BASIC }).then(function(nombre) {
         res.json(nombre);
         console.log("Usuario creado")
       });
@@ -198,7 +108,7 @@ router.post('/usuarios/crear', function(req, res) {
 
 //Get Usuarios 
 
-router.get('/usuarios', authRole(ROLES.ADMIN), (req, res) => {
+router.get('/usuarios', authRole(roles.ADMIN), (req, res) => {
   
   sequelize.authenticate().then(async () => {
         
@@ -224,11 +134,14 @@ router.get('/usuarios/:indiceUsuarios', (req, res) => {
     
     const indiceUsuarios = req.params.indiceUsuarios;
     const verificarToken = funciones.verificarToken(req.headers.authorization);
-    console.log("Rol", verificarToken.rol === ROLES.ADMIN);
+    const query = `SELECT * FROM usuarios WHERE id = ${indiceUsuarios}`;
+    const [resultados] = await sequelize.query(query, { raw: true });
+
+    console.log("Rol", verificarToken.rol === roles.ADMIN);
     console.log(indiceUsuarios === verificarToken.toString());
 
 
-    if(indiceUsuarios === verificarToken.id.toString() || verificarToken.rol === ROLES.ADMIN){
+    if(indiceUsuarios === verificarToken.id.toString() || verificarToken.rol === roles.ADMIN){
       console.log("estoy validando")
       res.json(resultados);
     } else {
@@ -246,7 +159,7 @@ router.get('/usuarios/:indiceUsuarios', (req, res) => {
 
 //Put, actualizar USUARIO por id
 
-router.put('/usuarios/:indiceUsuario/actualizar-usuario', function(req, res) {
+router.put('/usuarios/:indiceUsuario', function(req, res) {
 
   const indiceUsuario = req.params.indiceUsuario;
   Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
@@ -258,11 +171,11 @@ router.put('/usuarios/:indiceUsuario/actualizar-usuario', function(req, res) {
       direccioEnvio: req.body.direccioEnvio,
       nombreUsuario: req.body.nombreUsuario,
       password: req.body.password,
-      rol: ROLES.BASIC
+      rol: roles.BASIC
   }).then((nombre) => {
     
     //Validacion de usuario autorizado
-    if(req.usuario.id.toString() === indiceUsuario.toString() || req.usuario.rol === ROLES.ADMIN ){
+    if(req.usuario.id.toString() === indiceUsuario.toString() || req.usuario.rol === roles.ADMIN ){
       return res.status(200).json(nombre);
     } else {
       res.send('No es permitido el acceso a este recurso.')
@@ -276,7 +189,7 @@ router.put('/usuarios/:indiceUsuario/actualizar-usuario', function(req, res) {
 
 //Delete, borrar USUARIO por id
 
-router.delete('/usuarios/:indiceUsuario/borrar-usuario', authRole(ROLES.ADMIN), function(req, res) {
+router.delete('/usuarios/:indiceUsuario', authRole(roles.ADMIN), function(req, res) {
   const indiceUsuario = req.params.indiceUsuario;
   Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
     nombre.destroy();
@@ -326,7 +239,7 @@ router.get('/productos/:indiceProductos', (req, res) => {
 
 //Post, crear productos. Debe enviarse por formulario
 
-router.post('/productos/crear', authRole(ROLES.ADMIN),function(req, res) {
+router.post('/productos', authRole(roles.ADMIN),function(req, res) {
   console.log(req.file)
   Producto.create({ nombreProducto: req.body.nombreProducto, imagen: req.file.path, precio: req.body.precio }).then(function(nombre) {
     res.json(nombre);
@@ -335,7 +248,7 @@ router.post('/productos/crear', authRole(ROLES.ADMIN),function(req, res) {
 
 //Put, actualizar producto por id
 
-router.put('/productos/:indiceProductos/actualizar-producto', authRole(ROLES.ADMIN), function(req, res) {
+router.put('/productos/:indiceProductos', authRole(roles.ADMIN), function(req, res) {
 
   const indiceProductos = req.params.indiceProductos;
   Productos.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
@@ -351,7 +264,7 @@ router.put('/productos/:indiceProductos/actualizar-producto', authRole(ROLES.ADM
 
 //Delete, borrar producto por id
 
-router.delete('/productos/:indiceProductos/borrar-producto', authRole(ROLES.ADMIN), function(req, res) {
+router.delete('/productos/:indiceProductos', authRole(roles.ADMIN), function(req, res) {
   const indiceProductos = req.params.indiceProductos;
     Productos.findByPk(req.params.indiceProductos).then(function(borrarProducto) {
       borrarProducto.destroy();
@@ -363,7 +276,7 @@ router.delete('/productos/:indiceProductos/borrar-producto', authRole(ROLES.ADMI
 //-------------------------------------PEDIDOS---------------------------------------------------------------------------
 
 //Crear pedido
-router.post('/pedidos/crear', asyncHandler (async(req, res) => {
+router.post('/pedidos', asyncHandler (async(req, res) => {
   
   //Buscar el usuario con el Id que dieron y asegurarme si existe. Si no, responder con error.
   const usuarioId = await Usuario.findByPk(req.body.usuarioId);
@@ -388,7 +301,7 @@ router.post('/pedidos/crear', asyncHandler (async(req, res) => {
         const pedidoProducto = {
           pedidoId: guardarPedido.id,
           productoId: item.id,
-          cantidad: item.cantidad,
+          cantidad: item.cantidad
         }
   
         //Crear y guardar un pedidoProducto
@@ -402,6 +315,10 @@ router.post('/pedidos/crear', asyncHandler (async(req, res) => {
 
 
       //Si todo esta bien
+
+
+
+
       return res.status(200).json(guardarPedido);
  
     } catch (e) { 
@@ -413,7 +330,7 @@ router.post('/pedidos/crear', asyncHandler (async(req, res) => {
 
 
 //Get obtenemos toda la informacion de Pedidos y productos. Solo para el usuario Administrador.
-router.get('/pedidos', authRole(ROLES.ADMIN), asyncHandler (async (req, res) => {
+router.get('/pedidos', authRole(roles.ADMIN), asyncHandler (async (req, res) => {
 
   //Obtener todos los pedidos
   const todoPedidos = await Pedido.findAll({
@@ -462,7 +379,7 @@ router.get('/pedidos/:indicePedidos', asyncHandler (async (req, res) => {
   });
   console.log(pedidoPorId);
   //Validacion de usuario autorizado
-    if(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === ROLES.ADMIN ){
+    if(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === roles.ADMIN ){
     console.log("estoy validando")
     return res.status(200).json(pedidoPorId);
   } else {
@@ -474,7 +391,7 @@ router.get('/pedidos/:indicePedidos', asyncHandler (async (req, res) => {
 
 
 //Actualizar / Editar pedidos.
-router.patch('/pedidos/:indicePedido/actualizar-estado', authRole(ROLES.ADMIN), asyncHandler (async (req, res) => {
+router.patch('/pedidos/:indicePedido', authRole(roles.ADMIN), asyncHandler (async (req, res) => {
 
   //Validamos si el valor enviado para modificar el  estado del pedido, se encuentra entre los valores permitidos.
   if (req.body.estado === "nuevo" || req.body.estado === "confirmado" || req.body.estado === "preparando" || req.body.estado === "enviando" || req.body.estado === "cancelado" || req.body.estado === "entregado" ) {
@@ -525,7 +442,7 @@ router.patch('/pedidos/:indicePedido/actualizar-estado', authRole(ROLES.ADMIN), 
 
 
 //Delete Pedido por id
-router.delete('/pedidos/:indicePedidos/borrar-pedido', authRole(ROLES.ADMIN), function(req, res) {
+router.delete('/pedidos/:indicePedidos', authRole(roles.ADMIN), function(req, res) {
   const indicePedidos = req.params.indicePedidos;
     Pedido.findByPk(req.params.indicePedidos).then(function(borrarPedido) {
       borrarPedido.destroy();

@@ -7,16 +7,12 @@ const jwt = require('jsonwebtoken')
 const informacionUsuario = { nombre : 'Natalia'}
 const firma = 'MateitoGusi123';
 const funciones = require('./funciones');
+const Sequelize = require('sequelize');
+const sequelize = require('./data/db-conexion');
 
 
 //Cofiguracion del servidor
 
-app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
-
-//Configuracion Base de datos
-
-const Sequelize = require('sequelize');
-const sequelize = require('./data/db-conexion');
 
 
 
@@ -34,18 +30,16 @@ const storage = multer.diskStorage({
 const autenticarUsuario = (req, res, next) => {
   if (req.path === '/usuarios/crear' || req.path === '/' || req.path === '/login' ) return next();
   
-  if (!req.headers.authorization) { // y no esta en la base de datos
+  if (!req.headers.authorization) { 
     res.json({ error: "No te has logeado"})
   } else {
     
     try{
-      console.log("Linea 140: ",req.headers.authorization);
-      console.log("Linea 141: ",req.headers.authorization.split(' ')[1]);
       const verificarToken = funciones.verificarToken(req.headers.authorization)
       console.log("verificando",verificarToken)
       if(verificarToken){
         req.usuario = verificarToken;
-        return next();s
+        return next();
       }
     } catch(error) {
       res.json({ error: "Error al validar el usuario."})
@@ -70,5 +64,4 @@ app.use(autenticarUsuario);
 app.use(require('./routes/index.routes'))
 
 
-module.exports = {autenticarUsuario};
-
+app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
