@@ -4,19 +4,13 @@ const multer = require('multer');
 const path = require('path');
 const uuid = require("uuid")
 const jwt = require('jsonwebtoken')
-const informacionUsuario = { nombre : 'Natalia'}
-const firma = 'MateitoGusi123';
 const funciones = require('./funciones');
 const Sequelize = require('sequelize');
 const sequelize = require('./data/db-conexion');
+const { autenticarUsuario }= require('./routes/middelwares');
 
 
-//Cofiguracion del servidor
-
-
-
-
-//Configuracion Multer
+//Configuracion Multer //Libreria para cargar las imagenes de productos
 const storage = multer.diskStorage({
   destination: path.join(__dirname,'uploads/'), 
   filename:(req, file, cb) => {
@@ -25,43 +19,24 @@ const storage = multer.diskStorage({
 });
 
 
-//Metodo Seguro
-
-const autenticarUsuario = (req, res, next) => {
-  if (req.path === '/usuarios/crear' || req.path === '/' || req.path === '/login' ) return next();
-  
-  if (!req.headers.authorization) { 
-    res.json({ error: "No te has logeado"})
-  } else {
-    
-    try{
-      const verificarToken = funciones.verificarToken(req.headers.authorization)
-      console.log("verificando",verificarToken)
-      if(verificarToken){
-        req.usuario = verificarToken;
-        return next();
-      }
-    } catch(error) {
-      res.json({ error: "Error al validar el usuario."})
-    }
-  }
-};
-
 //Middlewares
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
-app.use(multer({
+app.use(multer({//Libreria para cargar las imagenes de productos
   storage,
   dest: path.join(__dirname,'uploads/'),
   limits: {fieldSize:100000 }
 }).single('image'));
 
-app.use(autenticarUsuario);
+app.use(autenticarUsuario);//Autenticacion
+app.use(require('./routes/index.routes'))//Routes
+app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));//Configuracion Servidor
 
+app.use((err, req, res, next) => { //Manejo de errores genericos
 
-//Routes
-app.use(require('./routes/index.routes'))
+  if(!err) return next();
+  console.log('Error, algo salio mal', err);
+  res.status(500).send('Error')
 
-
-app.listen(3000, () => console.log(`Servidor Delilah Restó iniciado!`));
+});

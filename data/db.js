@@ -51,16 +51,16 @@ async function crearTablas() {
    
   await Producto.bulkCreate([
       
-    { nombreProducto: 'Hamburguesa clasica', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 10000 },
-    { nombreProducto: 'Hamburguesa Veggi', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 20000 },
-    { nombreProducto: 'Hamburguesa con todo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 30000 },
-    { nombreProducto: 'Hamburguesa de Cerdo', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 40000 },
-    { nombreProducto: 'Hamburguesa de aguacate', imagen: 'SOY LA IMAGEN DE LA HAMBURGUESA', precio: 50000 },
-    { nombreProducto: 'Coca cola', imagen: 'SOY LA IMAGEN DE LA cocacola', precio: 5000 },
-    { nombreProducto: 'Agua', imagen: 'SOY LA IMAGEN DEL AGUA', precio: 3000 },
-    { nombreProducto: 'Limonada de Mango', imagen: 'SOY LA IMAGEN DE LA LIMONADA DE MANGO', precio: 9000 },
-    { nombreProducto: 'Limonada', imagen: 'SOY LA IMAGEN DE LA LIMONADA', precio: 5000 },
-    { nombreProducto: 'Cafe', imagen: 'SOY LA IMAGEN DEL CAFE', precio: 8000 }
+    { nombreProducto: 'Hamburguesa clasica', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 10000 },
+    { nombreProducto: 'Hamburguesa Veggi', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 20000 },
+    { nombreProducto: 'Hamburguesa con todo', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 30000 },
+    { nombreProducto: 'Hamburguesa de Cerdo', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 40000 },
+    { nombreProducto: 'Hamburguesa de aguacate', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 50000 },
+    { nombreProducto: 'Coca cola', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 5000 },
+    { nombreProducto: 'Agua', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 3000 },
+    { nombreProducto: 'Limonada de Mango', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 9000 },
+    { nombreProducto: 'Limonada', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 5000 },
+    { nombreProducto: 'Cafe', imagen: '/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png', precio: 8000 }
       
   ]);
     
@@ -75,8 +75,8 @@ async function crearTablas() {
 
 
 
-module.exports.crearTablas=crearTablas;
-module.exports.modelos={
+module.exports.crearTablas = crearTablas;
+module.exports.modelos = {
     Producto,
     Usuario,
     Pedido,

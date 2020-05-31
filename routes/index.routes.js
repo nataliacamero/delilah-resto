@@ -1,9 +1,8 @@
 const { Router } = require('express');
 const router = Router();
 const jwt = require('jsonwebtoken');
-const informacionUsuario = { nombre : 'Natalia'};
-const firma = 'MateitoGusi123';
-const funciones = require('../funciones');//Funciones propias
+const {firma} = require('../seguridad/config-seguridad');
+const {checkToken, authRole} = require('../funciones');//Funciones propias
 const asyncHandler = require('express-async-handler');
 const Sequelize = require('sequelize');//Configuracion Base de datos
 const sequelize = require('../data/db-conexion');
@@ -28,9 +27,6 @@ router.get('/', (req, res) => res.send('Delilah Restó App'));
 router.post('/login', (req, res) => {
 
   let {nombreUsuario, password} = req.body;
-  console.log("Linea 103", nombreUsuario);
-  console.log("Linea 104", password);
-
   sequelize.authenticate().then(async () => {
     let {nombreUsuario, password} = req.body;
     const query = `SELECT id,nombre,nombreUsuario,password,rol FROM Delilah_Resto.usuarios WHERE nombreUsuario = ${JSON.stringify(nombreUsuario)} AND password = ${JSON.stringify(password)};`;
@@ -38,15 +34,17 @@ router.post('/login', (req, res) => {
     console.log(resultados);
     if (resultados.length > 0) {
       const token = jwt.sign({id: resultados[0].id, nombre: resultados[0].nombre, nombreUsuario: resultados[0].nombreUsuario, password: password, rol: resultados[0].rol}, firma);
+      res.statusCode = 200;
       res.json(token);
-      console.log(token)
-      console.log("Linea 133: ", resultados[0].id);
-      console.log("Linea 134: ", resultados[0].nombre);
-      console.log("Linea 135: ", resultados[0].nombreUsuario);
-      console.log("Linea 136: ", resultados[0].password);
-      console.log("Linea 137: ", resultados[0].rol);
+      // console.log(token)
+      // console.log("Linea 133: ", resultados[0].id);
+      // console.log("Linea 134: ", resultados[0].nombre);
+      // console.log("Linea 135: ", resultados[0].nombreUsuario);
+      // console.log("Linea 136: ", resultados[0].password);
+      // console.log("Linea 137: ", resultados[0].rol);
       return
     } else {
+      res.statusCode = 400;
       res.json({ error: "Usuario o contraseña incorrecta."});
       return
     }
@@ -59,21 +57,6 @@ router.post('/login', (req, res) => {
 router.post('/seguro', (req,res) => {
 res.send(`Esta es una página autenticada. Hola ${req.usuario.nombre}. Tu rol es ${req.usuario.rol}`)
 });
-
-
-// Verificar rol
-function authRole(role) {
-  
-  return (req, res, next) => {
-    console.log("Linea 167: ",req.usuario.rol.toString())
-    if (req.usuario.rol !== role) {
-      res.status(401)
-      return res.send('No es permitido el acceso a este recurso.')
-    }
-
-    next()
-  }
-}
 
 
 //-------------------------Usuarios---------------------------------------------------
@@ -90,9 +73,11 @@ router.post('/usuarios', function(req, res) {
     console.log(resultados);
 
     if(resultados.length > 0 ){
+      res.statusCode = 400;
       res.send('El usuario ya existe en la base de datos');
     } else {
       Usuario.create({ nombre: req.body.nombre, apellido: req.body.apellido, email: req.body.email, telefono: req.body.telefono , direccioEnvio: req.body.direccioEnvio, nombreUsuario: req.body.nombreUsuario, password: req.body.password, rol: roles.BASIC }).then(function(nombre) {
+        res.statusCode = 201;
         res.json(nombre);
         console.log("Usuario creado")
       });
@@ -100,6 +85,7 @@ router.post('/usuarios', function(req, res) {
   
   })
   .catch(err => {
+    res.statusCode = 500;
     console.error('Unable to connect to the database:', err);
   });
 
@@ -115,10 +101,12 @@ router.get('/usuarios', authRole(roles.ADMIN), (req, res) => {
     const query = 'SELECT * FROM usuarios';
     const [resultados] =  await sequelize.query(query, { raw: true })
     console.log(resultados);
+    res.statusCode = 200;
     res.json(resultados);
         
   })
   .catch(err => {
+    res.statusCode = 500;
     console.error('Unable to connect to the database:', err);
   });
 
@@ -133,7 +121,7 @@ router.get('/usuarios/:indiceUsuarios', (req, res) => {
   sequelize.authenticate().then(async () => {
     
     const indiceUsuarios = req.params.indiceUsuarios;
-    const verificarToken = funciones.verificarToken(req.headers.authorization);
+    const verificarToken = checkToken(req.headers.authorization);
     const query = `SELECT * FROM usuarios WHERE id = ${indiceUsuarios}`;
     const [resultados] = await sequelize.query(query, { raw: true });
 
@@ -143,13 +131,16 @@ router.get('/usuarios/:indiceUsuarios', (req, res) => {
 
     if(indiceUsuarios === verificarToken.id.toString() || verificarToken.rol === roles.ADMIN){
       console.log("estoy validando")
+      res.statusCode = 200;
       res.json(resultados);
     } else {
+      res.statusCode = 401;
       res.send('No es permitido el acceso a este recurso.');
     }
   
   })
   .catch(err => {
+    res.statusCode = 500;
     console.error('Unable to connect to the database:', err);
   });
 
@@ -178,6 +169,7 @@ router.put('/usuarios/:indiceUsuario', function(req, res) {
     if(req.usuario.id.toString() === indiceUsuario.toString() || req.usuario.rol === roles.ADMIN ){
       return res.status(200).json(nombre);
     } else {
+      res.statusCode = 401;
       res.send('No es permitido el acceso a este recurso.')
     }
       
@@ -194,7 +186,7 @@ router.delete('/usuarios/:indiceUsuario', authRole(roles.ADMIN), function(req, r
   Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
     nombre.destroy();
   }).then((nombre) => {
-    res.sendStatus(200);
+    res.sendStatus(204);
   });
 });
 
@@ -209,10 +201,12 @@ router.get('/productos', (req, res) => {
     const query = 'SELECT * FROM productos';
     const [resultados] =  await sequelize.query(query, { raw: true })
     console.log(resultados);
+    res.statusCode = 200;
     res.json(resultados);    
 
   })
   .catch(err => {
+    res.statusCode = 500;
     console.error('Unable to connect to the database:', err);
   });
 
@@ -228,9 +222,11 @@ router.get('/productos/:indiceProductos', (req, res) => {
     const query = `SELECT * FROM productos WHERE id = ${indiceProductos}`;
     const [resultados] =  await sequelize.query(query, { raw: true })
     console.log(resultados);
+    res.statusCode = 200;
     res.json(resultados);
   })
   .catch(err => {
+    res.statusCode = 500;
     console.error('Unable to connect to the database:', err);
   });
 
@@ -241,36 +237,57 @@ router.get('/productos/:indiceProductos', (req, res) => {
 
 router.post('/productos', authRole(roles.ADMIN),function(req, res) {
   console.log(req.file)
-  Producto.create({ nombreProducto: req.body.nombreProducto, imagen: req.file.path, precio: req.body.precio }).then(function(nombre) {
+  try {
+    Producto.create({ nombreProducto: req.body.nombreProducto, imagen: req.file.path, precio: req.body.precio }).then(function(nombre) {
+    res.statusCode = 201;
     res.json(nombre);
-  });
+    });  
+  } catch (error) {
+    res.statusCode = 500;
+    console.error('Unable to connect to the database:', err);
+  }
+  
 });
 
 //Put, actualizar producto por id
 
 router.put('/productos/:indiceProductos', authRole(roles.ADMIN), function(req, res) {
-
-  const indiceProductos = req.params.indiceProductos;
-  Productos.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
-    actualizacionProducto.update({
-      nombreProducto: req.body.nombre,
-      imagen: req.body.imagen,
-      precio: req.body.precio
-  }).then((actualizacionProducto) => {
+  try {
+    const indiceProductos = req.params.indiceProductos;
+    Productos.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
+      actualizacionProducto.update({
+        nombreProducto: req.body.nombre,
+        imagen: req.body.imagen,
+        precio: req.body.precio
+    }).then((actualizacionProducto) => {
+      res.statusCode = 200;
       res.json(actualizacionProducto);
     });
-  });
+  });  
+  } catch (error) {
+    res.statusCode = 500;
+    console.error('Unable to connect to the database:', err);
+  }
+  
 });
 
 //Delete, borrar producto por id
 
 router.delete('/productos/:indiceProductos', authRole(roles.ADMIN), function(req, res) {
-  const indiceProductos = req.params.indiceProductos;
+  
+  try {
+    const indiceProductos = req.params.indiceProductos;
     Productos.findByPk(req.params.indiceProductos).then(function(borrarProducto) {
       borrarProducto.destroy();
     }).then((borrarProducto) => {
-      res.sendStatus(200);
-    });
+      res.sendStatus(204);
+    });  
+  } catch (error) {
+    res.statusCode = 500;
+    console.error('Unable to connect to the database:', err);
+  }
+  
+  
 });
 
 //-------------------------------------PEDIDOS---------------------------------------------------------------------------
@@ -282,6 +299,7 @@ router.post('/pedidos', asyncHandler (async(req, res) => {
   const usuarioId = await Usuario.findByPk(req.body.usuarioId);
   
   if(!usuarioId) {
+    res.statusCode = 404;
     res.json({ error: "El usuario no existe"})
   } else {
 
@@ -311,15 +329,8 @@ router.post('/pedidos', asyncHandler (async(req, res) => {
       });
      
       if (!guardarPedido) throw new Error(`No fue posible guardar el producto ${item.id} en el pedido ${pedidoProducto.pedidoId}`);
-    
 
-
-      //Si todo esta bien
-
-
-
-
-      return res.status(200).json(guardarPedido);
+      return res.status(201).json(guardarPedido);
  
     } catch (e) { 
       console.log(e); 
@@ -331,9 +342,9 @@ router.post('/pedidos', asyncHandler (async(req, res) => {
 
 //Get obtenemos toda la informacion de Pedidos y productos. Solo para el usuario Administrador.
 router.get('/pedidos', authRole(roles.ADMIN), asyncHandler (async (req, res) => {
-
-  //Obtener todos los pedidos
-  const todoPedidos = await Pedido.findAll({
+  try {
+    //Obtener todos los pedidos
+    const todoPedidos = await Pedido.findAll({
     
     //Asegurarse de incluir los productos
     include: [{
@@ -352,7 +363,12 @@ router.get('/pedidos', authRole(roles.ADMIN), asyncHandler (async (req, res) => 
   });
 
    //Si todo esta bien
-   return res.status(200).json(todoPedidos);
+   return res.status(200).json(todoPedidos);  
+  } catch (error) {
+    res.statusCode = 500;
+    console.error('Unable to connect to the database:', err);
+  }
+  
 }));
 
 
@@ -378,11 +394,20 @@ router.get('/pedidos/:indicePedidos', asyncHandler (async (req, res) => {
       }]
   });
   console.log(pedidoPorId);
+  console.log("req.usuario",req.usuario.id.toString());
+  console.log("usuarioId",pedidoPorId.dataValues.usuarioId.toString());
+  console.log("req.usuario.rol",req.usuario.rol);
+  console.log("roles.admin",roles.ADMIN);
+  console.log(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() );
+  console.log(req.usuario.rol === roles.ADMIN);
+
+
   //Validacion de usuario autorizado
-    if(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === roles.ADMIN ){
+    if(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === roles.ADMIN){
     console.log("estoy validando")
     return res.status(200).json(pedidoPorId);
   } else {
+    res.statusCode = 401;
     res.send('No es permitido el acceso a este recurso.')
   }
   
@@ -443,12 +468,18 @@ router.patch('/pedidos/:indicePedido', authRole(roles.ADMIN), asyncHandler (asyn
 
 //Delete Pedido por id
 router.delete('/pedidos/:indicePedidos', authRole(roles.ADMIN), function(req, res) {
-  const indicePedidos = req.params.indicePedidos;
+  try {
+    const indicePedidos = req.params.indicePedidos;
     Pedido.findByPk(req.params.indicePedidos).then(function(borrarPedido) {
       borrarPedido.destroy();
     }).then((borrarPedido) => {
-      res.sendStatus(200);
-    });
+      res.sendStatus(204);
+    });  
+  } catch (error) {
+    res.statusCode = 500;
+    console.error('Unable to connect to the database:', err);
+  }
+  
 });
 
 module.exports = router;
