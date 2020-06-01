@@ -20,7 +20,7 @@ const autenticarUsuario = (req, res, next) => {
           req.usuario = verificarToken;
           return next();
         } else {
-            res.status(401).json({error: "Credenciales invalidas" })
+            res.status(400).json({error: "Credenciales invalidas" })
         }
   
       } catch(error) {

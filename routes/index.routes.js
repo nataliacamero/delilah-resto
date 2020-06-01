@@ -182,12 +182,18 @@ router.put('/usuarios/:indiceUsuario', function(req, res) {
 //Delete, borrar USUARIO por id
 
 router.delete('/usuarios/:indiceUsuario', authRole(roles.ADMIN), function(req, res) {
-  const indiceUsuario = req.params.indiceUsuario;
-  Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
+  try {
+    const indiceUsuario = req.params.indiceUsuario;
+    Usuario.findByPk(req.params.indiceUsuario).then(function(nombre) {
     nombre.destroy();
   }).then((nombre) => {
     res.sendStatus(204);
-  });
+  });  
+  } catch (error) {
+    res.statusCode = 400;
+    res.send('No fue encontrado el usuario en bd.');
+  }
+  
 });
 
 //-------------------------Productos---------------------------------------------------
@@ -218,12 +224,21 @@ router.get('/productos', (req, res) => {
 router.get('/productos/:indiceProductos', (req, res) => {
  
   sequelize.authenticate().then(async () => {
+    
     const indiceProductos = req.params.indiceProductos;
     const query = `SELECT * FROM productos WHERE id = ${indiceProductos}`;
     const [resultados] =  await sequelize.query(query, { raw: true })
     console.log(resultados);
-    res.statusCode = 200;
-    res.json(resultados);
+    
+    if (resultados.length > 0) {
+      res.statusCode = 200;
+      res.json(resultados);
+
+    } else {
+      res.statusCode = 404;
+      res.json({ error: "El producto no existe"})
+    }
+
   })
   .catch(err => {
     res.statusCode = 500;
@@ -254,7 +269,7 @@ router.post('/productos', authRole(roles.ADMIN),function(req, res) {
 router.put('/productos/:indiceProductos', authRole(roles.ADMIN), function(req, res) {
   try {
     const indiceProductos = req.params.indiceProductos;
-    Productos.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
+    Producto.findByPk(req.params.indiceProductos).then(function(actualizacionProducto) {
       actualizacionProducto.update({
         nombreProducto: req.body.nombre,
         imagen: req.body.imagen,
@@ -266,7 +281,7 @@ router.put('/productos/:indiceProductos', authRole(roles.ADMIN), function(req, r
   });  
   } catch (error) {
     res.statusCode = 500;
-    console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to the database:', error);
   }
   
 });
@@ -277,14 +292,14 @@ router.delete('/productos/:indiceProductos', authRole(roles.ADMIN), function(req
   
   try {
     const indiceProductos = req.params.indiceProductos;
-    Productos.findByPk(req.params.indiceProductos).then(function(borrarProducto) {
+    Producto.findByPk(req.params.indiceProductos).then(function(borrarProducto) {
       borrarProducto.destroy();
     }).then((borrarProducto) => {
       res.sendStatus(204);
     });  
   } catch (error) {
     res.statusCode = 500;
-    console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to the database:', error);
   }
   
   
@@ -333,6 +348,8 @@ router.post('/pedidos', asyncHandler (async(req, res) => {
       return res.status(201).json(guardarPedido);
  
     } catch (e) { 
+      res.statusCode = 404;
+      res.json({ error: "El pedido no pudo ser creado"})
       console.log(e); 
     }
   }
@@ -366,7 +383,7 @@ router.get('/pedidos', authRole(roles.ADMIN), asyncHandler (async (req, res) => 
    return res.status(200).json(todoPedidos);  
   } catch (error) {
     res.statusCode = 500;
-    console.error('Unable to connect to the database:', err);
+    res.json({ error: "No se puede conectar con la base de datos"})
   }
   
 }));

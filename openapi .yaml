@@ -1,0 +1,988 @@
+openapi: 3.0.0
+info:
+  title: Delilah Restó API
+  description: Esta aplicacion permite interactuar con la iformacion de Delila restó, usuarios, prouctos y pedidos.
+  contact:
+    name: Natalia Camero
+    url: https://github.com/nataliacamero/delilah-resto
+    email: nataliacameroc@gmail.com
+  license:
+    name: MIT
+    url: http://www.apache.org/licenses
+  version: 1.0.0
+  
+servers:
+  - url: http://localhost:3000
+    description: My local server
+    variables:
+      port:
+        default: '3000'
+
+tags:
+- name: "Crear, logear y autenticar"
+  description: "Metodos para ingresar a Delilah Resto."
+- name: "Usuarios"
+  description: "Operaciones con usuarios Delilah Resto. A partir de aqui se necesita TOKEN de autenticacion"
+- name: "Productos"
+  description: "Operaciones con productos Delilah Resto"
+- name: "Pedidos"
+  description: "Operaciones con pedidos Delilah Resto"
+
+      
+paths:
+  /usuarios:
+    post:
+      tags:
+      - "Crear, logear y autenticar"
+      summary: "Crear un nuevo usuario"
+      description: Permite crear usuarios en la base de datos.
+      parameters: 
+      - name: usuarios
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Crear un nuevo usuario en la base de datos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre del usuario
+                  example: 'Pablo'
+                apellido:
+                  type: string
+                  description: Apellidos del usuario
+                  example: 'Camero'
+                email:
+                  type: string
+                  description: Email del usuario
+                  example: 'nataliacameroc@gmail.com'
+                telefono:
+                  type: string
+                  description: Telefono del usuario
+                  example: "3013606833"
+                direccionEnvio:
+                  type: string
+                  description: Direccion de envio del usuario
+                  example: "Calle 85 # 44 - 77"
+                nombreUsuario:
+                  type: string
+                  description: Nombre de usuario, o correo electronico
+                  example: "nataliacameroc@gmail.com"
+                password:
+                  type: string
+                  description: Password del usuario
+                  example: 'NAHGhjjygsdf**'    
+        
+      responses:
+        201:
+          description: Usuario Creado
+          content:
+            aplication/json:
+              schema:
+                type: object
+                properties:
+                  nombre:
+                    type: string
+                    description: Nombre del usuario
+                    example: 'Pablo'
+                  apellido:
+                    type: string
+                    description: Apellidos del usuario
+                    example: 'Camero'
+                  email:
+                    type: string
+                    description: Email del usuario
+                    example: 'nataliacameroc@gmail.com'
+                  telefono:
+                    type: string
+                    description: Telefono del usuario
+                    example: "3013606833"
+                  direccionEnvio:
+                    type: string
+                    description: Direccion de envio del usuario
+                    example: "Calle 85 # 44 - 77"
+                  nombreUsuario:
+                    type: string
+                    description: Nombre de usuario, o correo electronico
+                    example: "nataliacameroc@gmail.com"
+                  password:
+                    type: string
+                    description: Password del usuario
+                    example: 'NAHGhjjygsdf**'   
+        
+      
+      
+        400:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 400": "El usuario ya existe en la base de datos."}
+  
+  
+    get:
+      tags: 
+      - "Usuarios"
+      summary: "Listar usuarios existentes"      
+      description:  Solo el usuario Administrador lista los usuarios existentes en bd. Debe enviar por headers el token del usuario autorizado.
+
+      responses:
+        200:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nombre:
+                      type: string
+                      example: Natalia
+                    apellido:
+                      type: string
+                      example: Camero
+                    email:
+                      type: string
+                      example: nataliacameroc@gmail.com
+                    telefono:
+                      type: string
+                      example: "3013606833"
+                    direccionEnvio:
+                      type: string
+                      example: "Calle 85 # 44 - 77"
+                    nombreUsuario:
+                      type: string
+                      description: Nombre de usuario, o correo electronico
+                      example: "nataliacameroc@gmail.com"
+                    password:
+                      type: string
+                      example: NAHGhjjygsdf**
+                    rol:
+                      type: string
+                      example: "Administrador"
+                    createdAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                      
+        401:
+          description: No autorizado
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 401. Error al validar el usuario."}
+                
+                
+    
+    
+    
+  /login:
+    post:
+      tags:
+      -   "Crear, logear y autenticar"
+      summary: "Autenticar un usuario"
+      description: Permite a un usuario ya creado autenticarse.
+      parameters: 
+      - name: login
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Autentica un usuario existente en la base de datos.
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                nombreUsuario:
+                  type: string
+                  description: Nombre de usuario, o correo electronico
+                  example: "nataliacameroc@gmail.com"
+                password:
+                  type: string
+                  description: Password del usuario
+                  example: 'NAHGhjjygsdf**'    
+        
+      responses:
+        200:
+          description: Usuario logueado
+          content:
+              text/plain:
+                schema:
+                  type: string
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5NTkzMjF9.wum_e9qc4qUtbhvFHEVrnL8WE69sHcMb9dRuA8iGyDM"
+        
+      
+        400:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 400": "Usuario o contraseña incorrecta."}  
+                
+  
+  /seguro:
+    post:
+      tags:
+      - "Crear, logear y autenticar"
+      summary: "Autorizar a un usuario"
+      description: Permite autorizar a un usuario logueado.
+      parameters: 
+      - name: Authorization
+        in: header
+        required: true
+        description: Debe poner el token entregado en el metodo login
+        content:
+          text/plain:
+            schema:
+              type: object
+              example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5NTkzMjF9.wum_e9qc4qUtbhvFHEVrnL8WE69sHcMb9dRuA8iGyDM
+   
+        
+      responses:
+        200:
+          description: Usuario Autenticado
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"200": "Esta es una página autenticada. Hola Natalia. Tu rol es Administrador"} 
+        
+      
+        401:
+          description: Peticion no exitosa
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 401": "Error al validar el usuario."}
+        
+        
+        400:
+          description: Peticion no exitosa
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 401": "Credeciales invalidas."} 
+                
+                
+                
+       
+                    
+  
+  /usuarios/{id}:
+    get:
+      tags:
+      - "Usuarios"
+      summary: "Traer un usuario por su id"
+      description: Obtener informacion de un usuario ingresando su ID
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: ID del usuario
+          schema:
+            type: string
+            example: 1
+            
+            
+      responses:
+        200:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nombre:
+                      type: string
+                      example: Natalia
+                    apellido:
+                      type: string
+                      example: Camero
+                    email:
+                      type: string
+                      example: nataliacameroc@gmail.com
+                    telefono:
+                      type: string
+                      example: "3013606833"
+                    direccionEnvio:
+                      type: string
+                      example: "Calle 85 # 44 - 77"
+                    nombreUsuario:
+                      type: string
+                      description: Nombre de usuario, o correo electronico
+                      example: "nataliacameroc@gmail.com"
+                    password:
+                      type: string
+                      example: NAHGhjjygsdf**
+                    rol:
+                      type: string
+                      example: "Administrador"
+                    createdAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+          
+        401:
+          description: Usuario no encontrado
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 404" : "No es permitido el acceso a este recurso"}
+                  
+  
+    put:
+      tags:
+      - "Usuarios"
+      summary: "Actualizar a un usuario existente en la bd."  
+      description: Actualizacion de usuario. Solo usuario Administrador o el dueño de la cuenta pueden modificar su información.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: Id de usuario
+          schema:
+            type: string
+            example: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                nombre:
+                  type: string
+                  description: Nombre del usuario
+                  example: 'Pablo'
+                apellido:
+                  type: string
+                  description: Apellidos del usuario
+                  example: 'Camero'
+                email:
+                  type: string
+                  description: Email del usuario
+                  example: 'nataliacameroc@gmail.com'
+                telefono:
+                  type: string
+                  description: Telefono del usuario
+                  example: "3013606833"
+                direccionEnvio:
+                  type: string
+                  description: Direccion de envio del usuario
+                  example: "Calle 85 # 44 - 77"
+                nombreUsuario:
+                  type: string
+                  description: Nombre de usuario, o correo electronico
+                  example: "nataliacameroc@gmail.com"
+                password:
+                  type: string
+                  description: Password del usuario
+                  example: 'NAHGhjjygsdf**' 
+            
+      responses:
+        200:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    nombre:
+                      type: string
+                      example: Natalia
+                    apellido:
+                      type: string
+                      example: Camero
+                    email:
+                      type: string
+                      example: nataliacameroc@gmail.com
+                    telefono:
+                      type: string
+                      example: "3013606833"
+                    direccionEnvio:
+                      type: string
+                      example: "Calle 85 # 44 - 77"
+                    nombreUsuario:
+                      type: string
+                      description: Nombre de usuario, o correo electronico
+                      example: "nataliacameroc@gmail.com"
+                    password:
+                      type: string
+                      example: NAHGhjjygsdf**
+                    rol:
+                      type: string
+                      example: "Administrador"
+                    createdAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                      
+        401:
+          description: No autorizado
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 401" : "No es permitido el acceso a este recurso."}
+      
+
+      
+      
+    
+    
+    delete:
+      tags: 
+      - "Usuarios"
+      summary: "EL Administrador borra a un usuario existente en la bd"    
+      description: Eliminación de usuario. Solo usuario Administrador
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: Id de usuario
+          schema:
+            type: number
+            example: 1
+
+          
+              
+      responses:
+        204:
+          description: Operacion exitosa
+
+                  
+      
+        400:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 400":"No fue encontrado el usuario en bd."}
+
+                      
+  /productos:
+    get:
+      tags:
+      - "Productos"
+      summary: "Lista todos los productos de Delilah Resto"
+      description: Permite obtener todos los productos.Debe enviarse por headers el token del usuario autorizado.
+
+      responses:
+        200:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: number
+                      example: 1
+                    nombreProducto:
+                        type: string
+                        example: Hamburguesa Clasica
+                    imagen:
+                        type: string
+                        example: "/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png"
+                    precio:
+                        type: number
+                        example: 6200
+                    createdAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                      
+        500:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 500":"No se puede conectar a la base de datos"}
+    
+    
+    post:
+      tags:
+      - "Productos"
+      summary: "Crear productos"
+      description: Permite crear productos en la base de datos. Debe enviar el token por headers
+      parameters: 
+      - in: path
+        name: productos
+        required: true
+        schema:
+          type: string
+        description: Crear un nuevo producto en bd.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                id:
+                  description: Id del producto
+                  type: string
+                  example: 1
+                nombreProducto:
+                  description: Nombre del producto
+                  type: string
+                  example: Hamburguesa Clasica
+                imageFile:
+                  description: Imagen del producto
+                  type: string
+                  format: binary
+                  example: imagenes/plato_hamburguesa_clasica
+                precio:
+                  description: Precio del producto
+                  type: number
+                  example: 6200   
+
+      
+      responses:
+        201:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Id del producto
+                    type: string
+                    example: 1
+                  nombreProducto:
+                    description: Nombre del producto
+                    type: string
+                    example: Hamburguesa Clasica
+                  imagen:
+                    description: Imagen del producto
+                    type: string
+                    format: binary
+                    example: imagenes/plato_hamburguesa_clasica
+                  precio:
+                    description: Precio del producto
+                    type: number
+                    example: 6200 
+                  createdAt:
+                    type: string
+                    example: "2020-05-31T20:40:25.000Z"
+                  updatedAt:
+                    type: string
+                    example: "2020-05-31T20:40:25.000Z"
+
+        500:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 500": "No se puede conectar a la base de datos."}
+                  
+    
+ 
+  
+  
+  /productos/{id}:
+    get:
+      tags:
+      - "Productos"
+      summary: "Lista los productos por su id"
+      description: Obtener informacion del producto ingresando su ID. Debe poner el token entregado en el metodo login.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: id del producto
+          schema:
+            type: string
+            example: 1
+            
+      responses:
+        200:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: number
+                      example: 1
+                    nombreProducto:
+                        type: string
+                        example: Hamburguesa Clasica
+                    imagen:
+                        type: string
+                        example: "/home/natalita/Escritorio/Proyecto Delilah-Resto/delilah-resto/uploads/134c4cd6-53d8-4b56-9d0e-a2ff0b461f51.png"
+                    precio:
+                        type: number
+                        example: 6200
+                    createdAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                        
+        404:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: { "error 404": "El producto no existe"}
+                
+    
+    put:
+      tags:
+      - "Productos"
+      summary: "Actualiza los productos de Delilah Resto"
+      description: Actualizacion de producto por su id. Solo usuario Administrador puede modificar la informacion del producto. Debe enviar el token por header.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: Id de producto
+          schema:
+            type: string
+            example: 1
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                id:
+                  description: Id del producto
+                  type: string
+                  example: 1
+                nombreProducto:
+                  description: Nombre del producto
+                  type: string
+                  example: Hamburguesa Clasica
+                imagen:
+                  description: Imagen del producto
+                  type: string
+                  format: binary
+                  example: imagenes/plato_hamburguesa_clasica
+                precio:
+                  description: Precio del producto
+                  type: number
+                  example: 6200  
+  
+      responses:
+        201:
+          description: Producto Actualizado
+          content:
+            aplication/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Id del producto
+                    type: string
+                    example: 1
+                  nombreProducto:
+                    description: Nombre del producto
+                    type: string
+                    example: Hamburguesa Clasica
+                  imagen:
+                    description: Imagen del producto
+                    type: string
+                    format: binary
+                    example: imagenes/plato_hamburguesa_clasica
+                  precio:
+                    description: Precio del producto
+                    type: number
+                    example: 6200 
+                  createdAt:
+                    type: string
+                    example: "2020-05-31T20:40:25.000Z"
+                  updatedAt:
+                    type: string
+                    example: "2020-05-31T20:40:25.000Z"
+  
+        500:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 500": "No se puede conectar a la base de datos."}
+      
+    
+    
+    delete:
+      tags:
+      - "Productos"
+      summary: "Borra un producto de Delilah Resto"
+      description: Eliminacion de producto. Solo usuario Administrador puede elimina un producto. Debe enviar el token por headers.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: Id de poducto
+          schema:
+            type: string
+            example: 1
+          
+          
+              
+      responses:
+        204:
+          description: Operacion exitosa
+                  
+                  
+      
+        500:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 500": "No se puede conectar a la base de datos."}
+                
+
+
+  /pedidos:
+  
+    get:
+      tags:
+      - "Pedidos"
+      summary: "Lista todos los pedidos de Delilah Resto"
+      description: Permite obtener todos los pedidos. Debe enviarse por headers el token del usuario autorizado.
+      
+      responses:
+        200:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: string
+                      description: Id del pedido
+                      example: "1"
+                    fecha:
+                      description: Fecha del pedido
+                      type: string
+                      example: "2020-05-31"
+                    tipo_pago:
+                      description: Forma de pago
+                      type: string
+                      example: "efectivo"
+                    estado:
+                      description: Estado del pedido
+                      type: string
+                      example: "nuevo"
+                    precioFinal:
+                      description: Precio del pedido
+                      type: string
+                      example: "120000"
+                    createdAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    updatedAt:
+                      type: string
+                      example: "2020-05-31T20:40:25.000Z"
+                    usuarioId:
+                      description: Id del usuario
+                      type: string
+                      example: "3"
+                    productoId:
+                      description: Id del producto
+                      type: string
+                      example: "5"
+                    nombreProducto:
+                      description: Nombre del producto
+                      type: string
+                      example: Hamburguesa Clasica
+                    imagen:
+                      description: Imagen del producto
+                      type: string
+                      format: binary
+                      example: imagenes/plato_hamburguesa_clasica
+                    precio:
+                      description: Precio del producto
+                      type: number
+                      example: 6200
+                    cantidad:
+                      description: Cantidad productos por pedido
+                      type: number
+                      example: 3
+                    
+                      
+        500:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 500":"No se puede conectar a la base de datos"}
+      
+
+    post:
+      tags:
+      - "Pedidos"
+      summary: "Crear pedidos"
+      description: Permite crear pedidos en la base de datos. Debe enviar el token por headers.
+      parameters: 
+      - in: path
+        name: pedidos
+        required: true
+        schema:
+          type: string
+        description: Crear un nuevo pedido en bd.
+      requestBody:
+        content:
+          aplication/json:
+            schema:
+              properties:
+                fecha:
+                  description: Fecha del pedido
+                  type: string
+                  example: "2020-05-31"
+                tipo_pago:
+                  description: Forma de pago
+                  type: string
+                  example: "efectivo"
+                estado:
+                  description: Estado del pedido
+                  type: string
+                  example: "nuevo"
+                precioFinal:
+                  description: Precio del pedido
+                  type: string
+                  example: "120000"
+                usuarioId:
+                  description: Id del usuario
+                  type: string
+                  example: "3"
+                productoId:
+                  description: Id del producto
+                  type: string
+                  example: "5"
+                cantidad:
+                  description: Cantidad productos por pedido
+                  type: number
+                  example: 3   
+
+
+      responses:
+        201:
+          description: Peticion exitosa
+          content:
+            aplication/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Id del pedido
+                    type: number
+                    example: 1
+                  fecha:
+                    description: Fecha del pedido
+                    type: string
+                    example: "2020-05-31"
+                  tipo_pago:
+                    description: Forma de pago
+                    type: string
+                    example: "efectivo"
+                  estado:
+                    description: Estado del pedido
+                    type: string
+                    example: "nuevo"
+                  precioFinal:
+                    description: Precio del pedido
+                    type: string
+                    example: "120000"
+                  usuarioId:
+                    description: Id del usuario
+                    type: string
+                    example: "3"
+                  productoId:
+                    description: Id del producto
+                    type: string
+                    example: "5"
+                  cantidad:
+                    description: Cantidad productos por pedido
+                    type: number
+                    example: 3
+                  createdAt:
+                    type: string
+                    example: "2020-05-31T20:40:25.000Z"
+                  updatedAt:
+                    type: string
+                    example: "2020-05-31T20:40:25.000Z"
+        
+      
+      
+        404:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 404": "El pedido no pudo ser creado."}
+                
+  
+    delete:
+      tags:
+      - "Pedidos"
+      summary: "Borrar pedidos"
+      description: Eliminacion de pedido por su id. Solo usuario Administrador puede eliminar un producto. Debe enviar el token por headers.
+      parameters: 
+        - in: path
+          name: id
+          required: true
+          description: Id de pedido
+          schema:
+            type: string
+            example: 1
+
+          
+              
+      responses:
+        204:
+          description: Peticion exitosa
+          
+                  
+      
+        500:
+          description: Peticion sin exito
+          content:
+            aplication/json:
+              schema:
+                type: string
+                example: {"Error 500":"No se puede conectar con la bd."}

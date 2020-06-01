@@ -30,7 +30,7 @@ const Pedido = sequelize.define('pedido',{
   fecha: Sequelize.DATE,
   tipo_pago: Sequelize.STRING,
   estado: Sequelize.STRING,
-  precio: Sequelize.INTEGER
+  precioFinal: Sequelize.INTEGER
 });
 
 const Pedidos_Producto = sequelize.define('pedidos_producto', {
