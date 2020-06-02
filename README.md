@@ -23,7 +23,7 @@ Luego ejecuta:
 ### Node.js
 #
 Para [Node.js], Puedes descargarla en (https://nodejs.org/) y escoger la version segun tu sistema operativo.
-
+#
 ### Npm
 #
 La libreria publica es [npm](https://www.npmjs.com/), por favor sigue el procedimiento in ["Publishing npm packages"](https://docs.npmjs.com/getting-started/publishing-npm-packages).
