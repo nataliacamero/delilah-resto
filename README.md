@@ -231,7 +231,6 @@ Este proyecto está bajo la Licencia (MIT)
     - Christian Bravo Compañero 👨‍💻.
     - Acamica 🏫---https://www.acamica.com/ 
     - Globant 👩‍💼---https://www.globant.com/es/taxonomy/term/13
-    - 
 
 
 
