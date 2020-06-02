@@ -43,6 +43,20 @@
       "description": "Operaciones con pedidos Delilah Resto"
     }
   ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
   "paths": {
     "/usuarios": {
       "post": {
@@ -1044,7 +1058,7 @@
           "Pedidos"
         ],
         "summary": "Lista todos los pedidos de Delilah Resto",
-        "description": "Permite obtener todos los pedidos. Debe enviarse por headers el token del usuario autorizado.",
+        "description": "Permite obtener todos los pedidos. Debe enviarse por headers el token del usuario autorizado.ADministrador",
         "responses": {
           "200": {
             "description": "Peticion exitosa",
@@ -1057,7 +1071,7 @@
                       "id": {
                         "type": "string",
                         "description": "Id del pedido",
-                        "example": "1"
+                        "example": 2
                       },
                       "fecha": {
                         "description": "Fecha del pedido",
@@ -1090,33 +1104,46 @@
                       "usuarioId": {
                         "description": "Id del usuario",
                         "type": "string",
-                        "example": "3"
+                        "example": 4
                       },
-                      "productoId": {
+                      "productos": {
                         "description": "Id del producto",
-                        "type": "string",
-                        "example": "5"
-                      },
-                      "nombreProducto": {
-                        "description": "Nombre del producto",
-                        "type": "string",
-                        "example": "Hamburguesa Clasica"
-                      },
-                      "imagen": {
-                        "description": "Imagen del producto",
-                        "type": "string",
-                        "format": "binary",
-                        "example": "imagenes/plato_hamburguesa_clasica"
-                      },
-                      "precio": {
-                        "description": "Precio del producto",
-                        "type": "number",
-                        "example": 6200
-                      },
-                      "cantidad": {
-                        "description": "Cantidad productos por pedido",
-                        "type": "number",
-                        "example": 3
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "3"
+                            },
+                            "nombreProducto": {
+                              "description": "Nombre del producto",
+                              "type": "string",
+                              "example": "Hamburguesa Clasica"
+                            },
+                            "imagen": {
+                              "description": "Imagen del producto",
+                              "type": "string",
+                              "format": "binary",
+                              "example": "imagenes/plato_hamburguesa_clasica"
+                            },
+                            "precio": {
+                              "description": "Precio del producto",
+                              "type": "number",
+                              "example": 6200
+                            },
+                            "pedidos_producto": {
+                              "description": "Id del producto",
+                              "type": "object",
+                              "properties": {
+                                "cantidad": {
+                                  "type": "number",
+                                  "example": 1
+                                }
+                              }
+                            }
+                          }
+                        }
                       }
                     }
                   }
@@ -1184,17 +1211,24 @@
                   "usuarioId": {
                     "description": "Id del usuario",
                     "type": "string",
-                    "example": "3"
+                    "example": 4
                   },
-                  "productoId": {
+                  "productos": {
                     "description": "Id del producto",
-                    "type": "string",
-                    "example": "5"
-                  },
-                  "cantidad": {
-                    "description": "Cantidad productos por pedido",
-                    "type": "number",
-                    "example": 3
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number",
+                          "example": 3
+                        },
+                        "cantidad": {
+                          "type": "string",
+                          "example": "1"
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -1239,16 +1273,6 @@
                       "type": "string",
                       "example": "3"
                     },
-                    "productoId": {
-                      "description": "Id del producto",
-                      "type": "string",
-                      "example": "5"
-                    },
-                    "cantidad": {
-                      "description": "Cantidad productos por pedido",
-                      "type": "number",
-                      "example": 3
-                    },
                     "createdAt": {
                       "type": "string",
                       "example": "2020-05-31T20:40:25.000Z"
@@ -1270,6 +1294,288 @@
                   "type": "string",
                   "example": {
                     "Error 404": "El pedido no pudo ser creado."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pedidos/{id}": {
+      "get": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Lista los pedidos por su id",
+        "description": "Obtener informacion del pedido ingresando su ID. Debe poner el token entregado en el metodo login. Solo puede acceder el usuario que genero el pedido o el Administrador.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "id del pedido",
+            "schema": {
+              "type": "string",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Peticion exitosa",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Id del pedido",
+                        "example": 2
+                      },
+                      "fecha": {
+                        "description": "Fecha del pedido",
+                        "type": "string",
+                        "example": "2020-05-31"
+                      },
+                      "tipo_pago": {
+                        "description": "Forma de pago",
+                        "type": "string",
+                        "example": "efectivo"
+                      },
+                      "estado": {
+                        "description": "Estado del pedido",
+                        "type": "string",
+                        "example": "nuevo"
+                      },
+                      "precioFinal": {
+                        "description": "Precio del pedido",
+                        "type": "string",
+                        "example": "120000"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "example": "2020-05-31T20:40:25.000Z"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "example": "2020-05-31T20:40:25.000Z"
+                      },
+                      "usuarioId": {
+                        "description": "Id del usuario",
+                        "type": "string",
+                        "example": 4
+                      },
+                      "productos": {
+                        "description": "Id del producto",
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "example": "3"
+                            },
+                            "nombreProducto": {
+                              "description": "Nombre del producto",
+                              "type": "string",
+                              "example": "Hamburguesa Clasica"
+                            },
+                            "imagen": {
+                              "description": "Imagen del producto",
+                              "type": "string",
+                              "format": "binary",
+                              "example": "imagenes/plato_hamburguesa_clasica"
+                            },
+                            "precio": {
+                              "description": "Precio del producto",
+                              "type": "number",
+                              "example": 6200
+                            },
+                            "pedidos_producto": {
+                              "description": "Id del producto",
+                              "type": "object",
+                              "properties": {
+                                "cantidad": {
+                                  "type": "number",
+                                  "example": 1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Peticion sin exito",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Error 401": "No es permitido el acceso a este recurso"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Pedidos"
+        ],
+        "summary": "Editar pedidos",
+        "description": "Permite editar el estado del pedido por su id, y los demás elementos de la base de datos. Debe enviar el token por headers. Solo usuario Administrador puede editar un pedido.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Debe poner el id del pedido para editar su estado y/o demás propiedades.",
+            "schema": {
+              "type": "string"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "aplication/json": {
+              "schema": {
+                "properties": {
+                  "fecha": {
+                    "description": "Fecha del pedido",
+                    "type": "string",
+                    "example": "2020-05-31"
+                  },
+                  "tipo_pago": {
+                    "description": "Forma de pago",
+                    "type": "string",
+                    "example": "efectivo"
+                  },
+                  "estado": {
+                    "description": "Estado del pedido",
+                    "type": "string",
+                    "example": "nuevo"
+                  },
+                  "precioFinal": {
+                    "description": "Precio del pedido",
+                    "type": "string",
+                    "example": "120000"
+                  },
+                  "usuarioId": {
+                    "description": "Id del usuario",
+                    "type": "string",
+                    "example": 4
+                  },
+                  "productos": {
+                    "description": "Id del producto",
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "3",
+                          "description": "Id del producto"
+                        },
+                        "pedidos_producto": {
+                          "type": "object",
+                          "properties": {
+                            "cantidad": {
+                              "type": "number",
+                              "example": 1
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Peticion exitosa",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "description": "Id del pedido",
+                      "type": "number",
+                      "example": 1
+                    },
+                    "fecha": {
+                      "description": "Fecha del pedido",
+                      "type": "string",
+                      "example": "2020-05-31"
+                    },
+                    "tipo_pago": {
+                      "description": "Forma de pago",
+                      "type": "string",
+                      "example": "efectivo"
+                    },
+                    "estado": {
+                      "description": "Estado del pedido",
+                      "type": "string",
+                      "example": "nuevo"
+                    },
+                    "precioFinal": {
+                      "description": "Precio del pedido",
+                      "type": "string",
+                      "example": "120000"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "example": "2020-05-31T20:40:25.000Z"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "example": "2020-05-31T20:40:25.000Z"
+                    },
+                    "usuarioId": {
+                      "description": "Id del usuario",
+                      "type": "string",
+                      "example": "3"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Peticion sin exito",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Error 400": "Algo ha fallado, la propiedad estado del pedido, solo puede contener una de los siguientes valores: nuevo, confirmado, preparando, enviando, cancelado, entregado."
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Peticion sin exito",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "string",
+                  "example": {
+                    "Error 404": "El pedido no existe."
                   }
                 }
               }

@@ -394,7 +394,7 @@ router.get('/pedidos/:indicePedidos', asyncHandler (async (req, res) => {
 
   //Obtener el pedido
   const pedidoPorId = await Pedido.findByPk((req.params.indicePedidos), {
-    
+        
       //Asegurarse de incluir los productos
       include: [{
         model: Producto,
@@ -410,20 +410,15 @@ router.get('/pedidos/:indicePedidos', asyncHandler (async (req, res) => {
         }
       }]
   });
-  console.log(pedidoPorId);
-  console.log("req.usuario",req.usuario.id.toString());
-  console.log("usuarioId",pedidoPorId.dataValues.usuarioId.toString());
-  console.log("req.usuario.rol",req.usuario.rol);
-  console.log("roles.admin",roles.ADMIN);
-  console.log(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() );
-  console.log(req.usuario.rol === roles.ADMIN);
-
 
   //Validacion de usuario autorizado
-    if(req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === roles.ADMIN){
-    console.log("estoy validando")
-    return res.status(200).json(pedidoPorId);
-  } else {
+  
+  if (req.usuario.id.toString() === pedidoPorId.dataValues.usuarioId.toString() || req.usuario.rol === roles.ADMIN){
+        
+      console.log("estoy validando")
+      return res.status(200).json(pedidoPorId);
+  
+  }  else {
     res.statusCode = 401;
     res.send('No es permitido el acceso a este recurso.')
   }
@@ -440,6 +435,12 @@ router.patch('/pedidos/:indicePedido', authRole(roles.ADMIN), asyncHandler (asyn
     
     // Obtenemos el pedido de la BD
     const pedido = await Pedido.findByPk(req.params.indicePedido);
+    
+    if (!pedido) {     
+      res.statusCode = 404;
+      res.json({ error: "El pedido no existe"});
+    }
+
     pedido.update({
       fecha: req.body.fecha,
       tipo_pago: req.body.tipo_pago,
