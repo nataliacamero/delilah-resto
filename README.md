@@ -183,7 +183,7 @@ Da un ejemplo
 
 ## Autores ✒️ 🤓
 
-* **Natalia Camero Carreño** - *Todo el trabajo* - [nataliacamero](https://github.com/nataliacamero)
+* **Natalia Camero Carreño** - (https://github.com/nataliacamero)
 
 También puedes mirar la lista de todos los [contribuyentes](https://github.com/nataliacamero/delilah-resto/contributors) quíenes han participado en este proyecto. 
 
