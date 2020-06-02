@@ -1,11 +1,16 @@
 # delilah_rest_api
 
-DelilahRestApi - JavaScript client for delilah_rest_api
+DelilahRestApi - JavaScript client for delilah_rest_api  
 Esta aplicacion permite interactuar con la iformacion de Delila restó, usuarios, productos y pedidos.
 
 ## Comenzando 🚀
 
-_Estas instrucciones te permitirán obtener una copia del proyecto en funcionamiento en tu máquina local para propósitos de desarrollo y pruebas._
+_Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto.
+
+Luego ejecuta asi:
+
+```shell
+    npm install nataliacamero/delilah-resto --save_
 
 Mira **Deployment** para conocer como desplegar el proyecto.
 
