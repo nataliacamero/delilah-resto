@@ -9,9 +9,9 @@ Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-re
 ### Pre-requisitos 📋
 
 ### Debes instalar los siguientes programas:
-#
+
 ### Git
-#
+
 Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto
 
 Luego ejecuta:
@@ -19,40 +19,40 @@ Luego ejecuta:
 ```shell
     npm install nataliacamero/delilah-resto --save
 ```
-#
+
 ### Node.js
-#
+
 Para [Node.js], Puedes descargarla en (https://nodejs.org/) y escoger la version segun tu sistema operativo.
-#
+
 ### Npm
-#
+
 La libreria publica es [npm](https://www.npmjs.com/), por favor sigue el procedimiento in ["Publishing npm packages"](https://docs.npmjs.com/getting-started/publishing-npm-packages).
 
 Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en la carpeta del repositorio y en el archivo package.json encontraras las dependencias que se necesitan, puedes instalarlas asi:
 
 -npm install- mas la dependencia.
 -npm init -v
-#
+
 
 ### Postman 
-#
+
 puedes descargarla en [Postman](https://www.postman.com/) - Herramienta para interactuar con APIs y realizar pruebas.
-#
+
 
 ### Visual Studio Code
-#
+
 Puedes descargarlo en [VisualStudioCode](https://code.visualstudio.com/)
 - La estructura de los archivos del proyecto es la siguiente:  
   
 
 ![](/Estructura_de_archivos__Delilah.png)
-#
+
 ### MySql Community Server
-#
+
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
 
 ### MySql Workbench:
-#
+
 Interfaz grafica de MySQl.
 
 Configura los datos de conexion de la BD.
@@ -61,7 +61,7 @@ Configura los datos de conexion de la BD.
 Los datos de la configuracion de la conexion, se ven aqui: 
 
 ![](/configuracion_conexion_mysql.jpg)
-#
+
 ### Crea la Base de Datos Delilah_Resto
 
 ### script:
@@ -71,10 +71,10 @@ CREATE SCHEMA IF NOT EXISTS `Delilah_Resto` DEFAULT CHARACTER SET latin1 ;
 USE `Delilah_Resto`;
 
 ```
-#
 
-#### Configuracion CONEXION base de datos
-#
+
+#### Configuracion CONEXION base de datos con Sequelize
+
 Puedes trabajar en Visual Estudio Code.
 
 En el archivo delilah-resto/data/db-conexion.js, está la configuracion de la conexion a la BASE DE DATOS, allí, en la siguiente variable, se deben configurar los datos asi:
@@ -82,14 +82,14 @@ En el archivo delilah-resto/data/db-conexion.js, está la configuracion de la co
 const sequelize = new Sequelize('mysql://user:password.@localhost:port/DatabaseName');
 
 
-*EXAMPLE* 
+*EJEMPLO* 
 
 const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto')*  
   
   
-#
+
 ### Instalación 🔧
-#
+
 
 Despues de instalar las dependencias, ejecuta el servidor con el siguiente comando:
 
@@ -97,20 +97,20 @@ Despues de instalar las dependencias, ejecuta el servidor con el siguiente coman
 
 Este comando, inicia el servidor, y  crea las tablas necesarias para el funcionamiento del proyecto.
 
-#
+
 ## Ejecutando las pruebas ⚙️
 
 ### Swagger editor
-#
+
 Esta herramienta sirve para visualizar la especificacion de los endpoints, de una manera mas legible y amigable. Se requiere su uso:
 
 https://editor.swagger.io/
 
-#
+
 Para guiarse sobre la informacion que se debe enviar en las pruebas, puede utilizar la herramienta https://editor.swagger.io/, y en file, importar el siguiente archivo: delilah-resto/openapi.yaml. Alli tendra una guia visual bastante completa sobre cada ruta y la informacion que requiere para funcionar.
 
 Para hacer las pruebas, utilizamos nuestro servidor Local con las rutas, se sugiere utilizar el orden de las rutas para crear, loguear y autenticar un usuario, para que se genere el token y se decofifique, para tener acceso a las demas rutas. 
-#
+
 ### Servidor Local
 http://localhost:3000/
 
@@ -131,6 +131,7 @@ http://localhost:3000/
 
 
 ### El token se debe enviar siempre en el Header, para las siguientes rutas:
+
 *EJEMPLO*
 *bearerAuth [ Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5MDQ3NDd9.1MRA90LfdEwk70FwOCya6TYFsSTLVV1TZsadYgrZpSA ]*
 
@@ -191,7 +192,7 @@ http://localhost:3000/
 
 
 
-#
+
 ### Analice las pruebas end-to-end 🔩
 
 Estas pruebas verifican, que se pueda acceder a los endpoints requeridos y que se cumplan con las condiciones solicitadas en el Check List de Acamica. Se sugiere que se hagan por medio de **POSTMAN**, si no existe frontend.
@@ -235,5 +236,3 @@ Este proyecto está bajo la Licencia (MIT)
 
 
 
----
-⌨️ con ❤️ por [Villanuevand](https://github.com/Villanuevand) 😊
