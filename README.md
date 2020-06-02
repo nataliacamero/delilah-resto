@@ -1,40 +1,16 @@
-# delilah_rest_api
+# Delilah Restó API
 
-DelilahRestApi - JavaScript client for delilah_rest_api  
 Esta aplicacion permite interactuar con la iformacion de Delila restó, usuarios, productos y pedidos.
 
 ## Comenzando 🚀
 
 Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto.
 
-Luego ejecuta asi:
-
-```shell
-    npm install nataliacamero/delilah-resto --save_
-
-Mira **Deployment** para conocer como desplegar el proyecto.
-
-
 ### Pre-requisitos 📋
 
-## Debes instalar los siguientes programas:
+### Debes instalar los siguientes programas:
 
-### For [Node.js](https://nodejs.org/)
-
-#### npm
-
-La libreria publica es [npm](https://www.npmjs.com/), por favor sigue el procedimiento in ["Publishing npm packages"](https://docs.npmjs.com/getting-started/publishing-npm-packages).
-
-###Para correr el proyecto clona el repositorio de github, en el archivo package.json encontraras las dependencias que se necesitan, puedes instalarlas asi:
-
--npm install- mas la dependencia.
-
-
-Luego ejecuta:
-
-
-
-#### git
+### git
 #
 Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto
 
@@ -44,26 +20,44 @@ Luego ejecuta:
     npm install nataliacamero/delilah-resto --save
 ```
 
-#### MySql Community Server
-#Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
+### Node.js
+#
+Para [Node.js], Puedes descargarla en (https://nodejs.org/) y escoger la version segun tu sistema operativo.
+
+### npm
+#
+La libreria publica es [npm](https://www.npmjs.com/), por favor sigue el procedimiento in ["Publishing npm packages"](https://docs.npmjs.com/getting-started/publishing-npm-packages).
+
+Para correr el proyecto, una vez clonado el repositorio, en el archivo package.json encontraras las dependencias que se necesitan, puedes instalarlas asi:
+
+-npm install- mas la dependencia.
+
+## MySql Community Server
+#
+Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
+
+Los datos de la configuracion de la conexion, se ven aqui: 
+
+![](/configuracion_conexion_mysql.jpg)
+
+### Crea la Base de Datos Delilah_Resto
+
+### script:
+
+```
+CREATE SCHEMA IF NOT EXISTS `Delilah_Resto` DEFAULT CHARACTER SET latin1 ;
+USE `Delilah_Resto`;
 
 ```
 
 ### Instalación 🔧
 
-_Una serie de ejemplos paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose_
+Despues de instalar las dependencias, ejecuta el servidor con el siguiente comando:
 
-_Dí cómo será ese paso_
+- node index.js - veras el saludo de Delila Restoh : Servidor Delilah Restó iniciado!
 
-```
-Da un ejemplo
-```
+Este comando, inicia el servidor, y  crea las tablas necesarias para el funcionamiento del proyecto.
 
-_Y repite_
-
-```
-hasta finalizar
-```
 
 _Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo_
 
@@ -79,50 +73,23 @@ _Explica que verifican estas pruebas y por qué_
 Da un ejemplo
 ```
 
-### Y las pruebas de estilo de codificación ⌨️
-
-_Explica que verifican estas pruebas y por qué_
-
-```
-Da un ejemplo
-```
-
-## Despliegue 📦
-
-_Agrega notas adicionales sobre como hacer deploy_
-
 ## Construido con 🛠️
 
 _Menciona las herramientas que utilizaste para crear tu proyecto_
 
 * [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - El framework web usado
-* [Maven](https://maven.apache.org/) - Manejador de dependencias
-* [ROME](https://rometools.github.io/rome/) - Usado para generar RSS
-
-## Contribuyendo 🖇️
-
-Por favor lee el [CONTRIBUTING.md](https://gist.github.com/villanuevand/xxxxxx) para detalles de nuestro código de conducta, y el proceso para enviarnos pull requests.
-
-## Wiki 📖
-
-Puedes encontrar mucho más de cómo utilizar este proyecto en nuestra [Wiki](https://github.com/tu/proyecto/wiki)
-
-## Versionado 📌
-
-Usamos [SemVer](http://semver.org/) para el versionado. Para todas las versiones disponibles, mira los [tags en este repositorio](https://github.com/tu/proyecto/tags).
 
 ## Autores ✒️
 
 _Menciona a todos aquellos que ayudaron a levantar el proyecto desde sus inicios_
 
-* **Andrés Villanueva** - *Trabajo Inicial* - [villanuevand](https://github.com/villanuevand)
-* **Fulanito Detal** - *Documentación* - [fulanitodetal](#fulanito-de-tal)
+* **Natalia Camero Carreño** - *Todo el trabajo* - [nataliacamero](https://github.com/nataliacamero)
 
-También puedes mirar la lista de todos los [contribuyentes](https://github.com/your/project/contributors) quíenes han participado en este proyecto. 
+También puedes mirar la lista de todos los [contribuyentes](https://github.com/nataliacamero/delilah-resto/contributors) quíenes han participado en este proyecto. 
 
 ## Licencia 📄
 
-Este proyecto está bajo la Licencia (Tu Licencia) - mira el archivo [LICENSE.md](LICENSE.md) para detalles
+Este proyecto está bajo la Licencia (MIT)
 
 ## Expresiones de Gratitud 🎁
 

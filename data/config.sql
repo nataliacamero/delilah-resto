@@ -8,13 +8,6 @@ SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema mydb
--- -----------------------------------------------------
--- -----------------------------------------------------
--- Schema Delilah_Resto
--- -----------------------------------------------------
-
--- -----------------------------------------------------
 -- Schema Delilah_Resto
 -- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `Delilah_Resto` DEFAULT CHARACTER SET latin1 ;
