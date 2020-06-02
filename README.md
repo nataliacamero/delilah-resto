@@ -38,12 +38,19 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 Puedes descargarlo en [VisualStudioCode](https://code.visualstudio.com/)
 - La estructura de los archivos del proyecto es la siguiente:  
   
-  
+
 ![](/Estructura_de_archivos__Delilah.png)
 #
 ### MySql Community Server
 #
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
+
+### MySql Workbench:
+#
+Interfaz grafica de MySQl.
+
+Configura los datos de conexion de la BD.
+
 
 Los datos de la configuracion de la conexion, se ven aqui: 
 
