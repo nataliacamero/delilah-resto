@@ -36,7 +36,7 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 ### MySql Community Server
 #
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
-
+#
 #### Configuracion CONEXION base de datos
 #
 En el archivo delilah-resto/data/db-conexion.js, está la configuracion de la conexion a la BASE DE DATOS, allí, en la siguiente variable, se deben configurar los datos asi:
