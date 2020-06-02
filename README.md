@@ -32,7 +32,7 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 
 -npm install- mas la dependencia.
 -npm init -v
-
+#
 ### MySql Community Server
 #
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
@@ -40,7 +40,7 @@ Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la versio
 Los datos de la configuracion de la conexion, se ven aqui: 
 
 ![](/configuracion_conexion_mysql.jpg)
-
+#
 ### Crea la Base de Datos Delilah_Resto
 
 ### script:
@@ -50,23 +50,23 @@ CREATE SCHEMA IF NOT EXISTS `Delilah_Resto` DEFAULT CHARACTER SET latin1 ;
 USE `Delilah_Resto`;
 
 ```
-
+#
 ### Instalación 🔧
-
+#
 
 Despues de instalar las dependencias, ejecuta el servidor con el siguiente comando:
 
-- node index.js - veras el saludo de Delila Restoh : Servidor Delilah Restó iniciado!
+- node index.js - veras el saludo de Delila Restoh en la consola : Servidor Delilah Restó iniciado!
 
 Este comando, inicia el servidor, y  crea las tablas necesarias para el funcionamiento del proyecto.
 
-
+#
 ## Ejecutando las pruebas ⚙️
-
+#
 Para guiarse sobre la informacion que se debe enviar en las pruebas, puede utilizar la herramienta https://editor.swagger.io/, y en file, importar el siguiente archivo: delilah-resto/openapi.yaml. Alli tendra una guia visual bastante completa sobre cada ruta y la informacion que requiere para funcionar.
 
 Para hacer las pruebas, utilizamos nuestro servidor Local con las rutas, se sugiere utilizar el orden de las rutas para crear, loguear y autenticar un usuario, para que se genere el token y se decofifique, para tener acceso a las demas rutas. 
-
+#
 ### Servidor Local
 http://localhost:3000/
 
@@ -85,29 +85,48 @@ http://localhost:3000/
 
 ### Usuarios:
 
-**GET** /usuarios | Listar usuarios existentes.
-**GET** /usuarios/{id} | Traer un usuario por su id.
-**PUT** /usuarios/{id} | Actualizar a un usuario existente en la bd.
-**DELETE** /usuarios/{id} | EL Administrador borra a un usuario. 
+**GET** /usuarios | Listar usuarios existentes.  
 
-### Productos:
+**GET** /usuarios/{id} | Traer un usuario por su id.   
 
-**POST** /productos | Crear productos
-**GET** /productos | Lista todos los productos de Delilah Resto.
-**GET** /productos/{id} | Lista los productos por su id.
-**PUT** /productos/{id} | Actualiza los productos de ctosPost). 
-**DELETE** /productos/{id} | Borra un producto de uctosIdGet).
+**PUT** /usuarios/{id} | Actualizar a un usuario existente en la bd.  
 
-### Pedidos:
+**DELETE** /usuarios/{id} | EL Administrador borra a un usuario.  
+  
 
-**POST** /pedidos | Crear pedidos.
-**GET** /pedidos | Lista todos los pedidos de Delilah Resto.
-**GET** /pedidos/{id} | Lista los pedidos por su id.
-**PATCH** /pedidos/{id} | Editar pedidos.
-**DELETE** /pedidos/{id} | Borrar pedidos.
+### Productos:  
+  
+  
+**POST** /productos | Crear productos  
+
+**GET** /productos | Lista todos los productos de Delilah Resto.  
+
+**GET** /productos/{id} | Lista los productos por su id.  
+
+**PUT** /productos/{id} | Actualiza los productos de ctosPost).  
+
+**DELETE** /productos/{id} | Borra un producto de uctosIdGet).  
+  
+    
+
+### Pedidos:  
+  
+  
+
+**POST** /pedidos | Crear pedidos.  
+
+**GET** /pedidos | Lista todos los pedidos de Delilah Resto.  
+  
+
+**GET** /pedidos/{id} | Lista los pedidos por su id.  
+
+**PATCH** /pedidos/{id} | Editar pedidos.  
+
+**DELETE** /pedidos/{id} | Borrar pedidos.  
 
 
 
+#
 ### Analice las pruebas end-to-end 🔩
 
 _Explica que verifican estas pruebas y por qué_
