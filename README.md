@@ -1,6 +1,6 @@
 # Delilah Restó API
 
-Esta aplicacion permite interactuar con la iformacion de Delila restó, usuarios, productos y pedidos.
+Esta aplicacion, hecha en Javascript puro, permite interactuar con la iformacion de Delila restó, usuarios, productos y pedidos.
 
 ## Comenzando 🚀
 
@@ -221,10 +221,18 @@ Este proyecto está bajo la Licencia (MIT)
 
 ## Expresiones de Gratitud 🎁
 
-* Comenta a otros sobre este proyecto 📢
+* Fe 🙏 
 * Invita una cerveza 🍺 o un café ☕ a alguien del equipo. 
-* Da las gracias públicamente 🤓.
-* etc.
+* Gracias sinceras a:
+    - Gustavo Maggi💕: con tu amor y apoyo, puedo alcanzar mis sueños¡¡
+    - Alejandro Arevalo 🤓 Profe.
+    - Camilo Salinas 🤓 Profe https://github.com/Rembrandtsx.
+    - Jorge Rojas Compañero 👨‍💻 https://github.com/jorgearojas25.
+    - Christian Bravo Compañero 👨‍💻.
+    - Acamica 🏫---https://www.acamica.com/ 
+    - Globant 👩‍💼---https://www.globant.com/es/taxonomy/term/13
+    - 
+
 
 
 
