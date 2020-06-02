@@ -37,14 +37,7 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 #
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
 #
-#### Configuracion CONEXION base de datos
-#
-En el archivo delilah-resto/data/db-conexion.js, está la configuracion de la conexion a la BASE DE DATOS, allí, en la siguiente variable, se deben configurar los datos asi:
 
-const sequelize = new Sequelize('mysql://user:password.@localhost:port/DatabaseName');
-
-
-*example : const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto')*
 
 #
 Los datos de la configuracion de la conexion, se ven aqui: 
@@ -61,6 +54,22 @@ USE `Delilah_Resto`;
 
 ```
 #
+
+#### Configuracion CONEXION base de datos
+#
+Puedes trabajar en Visual Estudio Code.
+
+En el archivo delilah-resto/data/db-conexion.js, está la configuracion de la conexion a la BASE DE DATOS, allí, en la siguiente variable, se deben configurar los datos asi:
+
+const sequelize = new Sequelize('mysql://user:password.@localhost:port/DatabaseName');
+
+
+*EXAMPLE* 
+
+const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto')*  
+  
+  
+
 ### Instalación 🔧
 #
 
