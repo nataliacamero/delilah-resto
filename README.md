@@ -5,7 +5,7 @@ Esta aplicacion permite interactuar con la iformacion de Delila restó, usuarios
 
 ## Comenzando 🚀
 
-_Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto.
+Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto.
 
 Luego ejecuta asi:
 
@@ -17,10 +17,36 @@ Mira **Deployment** para conocer como desplegar el proyecto.
 
 ### Pre-requisitos 📋
 
-_Que cosas necesitas para instalar el software y como instalarlas_
+## Debes instalar los siguientes programas:
 
+### For [Node.js](https://nodejs.org/)
+
+#### npm
+
+La libreria publica es [npm](https://www.npmjs.com/), por favor sigue el procedimiento in ["Publishing npm packages"](https://docs.npmjs.com/getting-started/publishing-npm-packages).
+
+###Para correr el proyecto clona el repositorio de github, en el archivo package.json encontraras las dependencias que se necesitan, puedes instalarlas asi:
+
+-npm install- mas la dependencia.
+
+
+Luego ejecuta:
+
+
+
+#### git
+#
+Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto
+
+Luego ejecuta:
+
+```shell
+    npm install nataliacamero/delilah-resto --save
 ```
-Da un ejemplo
+
+#### MySql Community Server
+#Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
+
 ```
 
 ### Instalación 🔧
