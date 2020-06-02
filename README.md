@@ -9,7 +9,7 @@ Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-re
 ### Pre-requisitos 📋
 
 ### Debes instalar los siguientes programas:
-
+#
 ### Git
 #
 Encontraras el repositorio en Github https://github.com/nataliacamero/delilah-resto
@@ -36,10 +36,7 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 ### MySql Community Server
 #
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
-#
 
-
-#
 Los datos de la configuracion de la conexion, se ven aqui: 
 
 ![](/configuracion_conexion_mysql.jpg)
@@ -69,7 +66,7 @@ const sequelize = new Sequelize('mysql://user:password.@localhost:port/DatabaseN
 const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto')*  
   
   
-
+#
 ### Instalación 🔧
 #
 
@@ -81,7 +78,7 @@ Este comando, inicia el servidor, y  crea las tablas necesarias para el funciona
 
 #
 ## Ejecutando las pruebas ⚙️
-#
+
 Para guiarse sobre la informacion que se debe enviar en las pruebas, puede utilizar la herramienta https://editor.swagger.io/, y en file, importar el siguiente archivo: delilah-resto/openapi.yaml. Alli tendra una guia visual bastante completa sobre cada ruta y la informacion que requiere para funcionar.
 
 Para hacer las pruebas, utilizamos nuestro servidor Local con las rutas, se sugiere utilizar el orden de las rutas para crear, loguear y autenticar un usuario, para que se genere el token y se decofifique, para tener acceso a las demas rutas. 
@@ -106,8 +103,8 @@ http://localhost:3000/
 
 
 ### El token se debe enviar siempre en el Header, para las siguientes rutas:
-
-bearerAuth [ Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5MDQ3NDd9.1MRA90LfdEwk70FwOCya6TYFsSTLVV1TZsadYgrZpSA ]
+*EJEMPLO*
+*bearerAuth [ Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5MDQ3NDd9.1MRA90LfdEwk70FwOCya6TYFsSTLVV1TZsadYgrZpSA ]*
 
 ### Usuarios:
 
