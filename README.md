@@ -33,6 +33,12 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 -npm install- mas la dependencia.
 -npm init -v
 #
+
+### Postman 
+#
+puedes descargarla en [Postman](https://www.postman.com/) - Herramienta para interactuar con APIs y realizar pruebas.
+#
+
 ### Visual Studio Code
 #
 Puedes descargarlo en [VisualStudioCode](https://code.visualstudio.com/)
@@ -94,6 +100,13 @@ Este comando, inicia el servidor, y  crea las tablas necesarias para el funciona
 #
 ## Ejecutando las pruebas ⚙️
 
+### Swagger editor
+#
+Esta herramienta sirve para visualizar la especificacion de los endpoints, de una manera mas legible y amigable. Se requiere su uso:
+
+https://editor.swagger.io/
+
+#
 Para guiarse sobre la informacion que se debe enviar en las pruebas, puede utilizar la herramienta https://editor.swagger.io/, y en file, importar el siguiente archivo: delilah-resto/openapi.yaml. Alli tendra una guia visual bastante completa sobre cada ruta y la informacion que requiere para funcionar.
 
 Para hacer las pruebas, utilizamos nuestro servidor Local con las rutas, se sugiere utilizar el orden de las rutas para crear, loguear y autenticar un usuario, para que se genere el token y se decofifique, para tener acceso a las demas rutas. 
