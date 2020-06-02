@@ -37,6 +37,16 @@ Para correr el proyecto, una vez clonado el repositorio, mediante cd ubicate en 
 #
 Puedes descargarla en https://dev.mysql.com/downloads/mysql/ y escoger la version segun tu sistema operativo.
 
+#### Configuracion CONEXION base de datos
+#
+En el archivo delilah-resto/data/db-conexion.js, está la configuracion de la conexion a la BASE DE DATOS, allí, en la siguiente variable, se deben configurar los datos asi:
+
+const sequelize = new Sequelize('mysql://user:password.@localhost:port/DatabaseName');
+
+
+*example : const sequelize = new Sequelize('mysql://root:N4t4l1t4.@localhost:3306/Delilah_Resto')*
+
+#
 Los datos de la configuracion de la conexion, se ven aqui: 
 
 ![](/configuracion_conexion_mysql.jpg)
@@ -74,38 +84,54 @@ http://localhost:3000/
 
 ### Crear, Loguear y Autenticar.
 
-**POST** /usuarios | Crear un nuevo.
-**POST** /login | Autenticar un usuario.
-**POST** /seguro | Autorizar a un usuario.
+**POST** /usuarios | Crear un nuevo.  
+*ejemplo: http://localhost:3000/usuarios*
+
+
+**POST** /login | Autenticar un usuario.  
+*ejemplo: http://localhost:3000/loguin*
+
+
+**POST** /seguro | Autorizar a un usuario.  
+*ejemplo: http://localhost:3000/seguro*
 
 
 ### El token se debe enviar siempre en el Header, para las siguientes rutas:
 
-### bearerAuth[Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5MDQ3NDd9.1MRA90LfdEwk70FwOCya6TYFsSTLVV1TZsadYgrZpSA ]
+bearerAuth [ Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibm9tYnJlIjoiTmF0YWxpYSIsIm5vbWJyZVVzdWFyaW8iOiJuYXRhbGlhY2FtZXJvY0BnbWFpbC5jb20iLCJwYXNzd29yZCI6IktKVUJIWUFTJiYlVFVHWUdZSiIsInJvbCI6IkFkbWluaXN0cmFkb3IiLCJpYXQiOjE1OTA5MDQ3NDd9.1MRA90LfdEwk70FwOCya6TYFsSTLVV1TZsadYgrZpSA ]
 
 ### Usuarios:
 
 **GET** /usuarios | Listar usuarios existentes.  
-
-**GET** /usuarios/{id} | Traer un usuario por su id.   
-
-**PUT** /usuarios/{id} | Actualizar a un usuario existente en la bd.  
-
-**DELETE** /usuarios/{id} | EL Administrador borra a un usuario.  
+*ejemplo: http://localhost:3000/usuarios*
   
+**GET** /usuarios/{id} | Traer un usuario por su id.   
+*ejemplo: http://localhost:3000/usuarios/1*
+  
+**PUT** /usuarios/{id} | Actualizar a un usuario existente en la bd.  
+*ejemplo: http://localhost:3000/usuarios/1*
+  
+**DELETE** /usuarios/{id} | EL Administrador borra a un usuario.  
+*ejemplo: http://localhost:3000/usuarios/1*
+
 
 ### Productos:  
   
   
 **POST** /productos | Crear productos  
+*ejemplo: http://localhost:3000/productos*
 
 **GET** /productos | Lista todos los productos de Delilah Resto.  
+*ejemplo: http://localhost:3000/productos*
 
 **GET** /productos/{id} | Lista los productos por su id.  
+*ejemplo: http://localhost:3000/productos/1*
 
-**PUT** /productos/{id} | Actualiza los productos de ctosPost).  
+**PUT** /productos/{id} | Actualiza los productos por su id.).  
+*ejemplo: http://localhost:3000/productos/1*
 
-**DELETE** /productos/{id} | Borra un producto de uctosIdGet).  
+**DELETE** /productos/{id} | Borra un producto de uctosIdGet).
+*ejemplo: http://localhost:3000/productos/1*  
   
     
 
@@ -114,15 +140,20 @@ http://localhost:3000/
   
 
 **POST** /pedidos | Crear pedidos.  
+*ejemplo: http://localhost:3000/pedidos*
 
 **GET** /pedidos | Lista todos los pedidos de Delilah Resto.  
-  
+*ejemplo: http://localhost:3000/pedidos*
+    
 
 **GET** /pedidos/{id} | Lista los pedidos por su id.  
+*ejemplo: http://localhost:3000/pedidos/1*
 
 **PATCH** /pedidos/{id} | Editar pedidos.  
+*ejemplo: http://localhost:3000/pedidos/1*  
 
 **DELETE** /pedidos/{id} | Borrar pedidos.  
+*ejemplo: http://localhost:3000/pedidos/1*
 
 
 
