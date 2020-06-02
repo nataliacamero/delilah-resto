@@ -108,7 +108,7 @@ http://localhost:3000/
 
 ### Usuarios:
 
-**GET** /usuarios | Listar usuarios existentes.  
+**GET** /usuarios | Listar usuarios existentes.  | Solo usuario ADMINISTRADOR 
 *ejemplo: http://localhost:3000/usuarios*
   
 **GET** /usuarios/{id} | Traer un usuario por su id.   
@@ -124,7 +124,7 @@ http://localhost:3000/
 ### Productos:  
   
   
-**POST** /productos | Crear productos  
+**POST** /productos | Crear productos  | Solo usuario ADMINISTRADOR
 *ejemplo: http://localhost:3000/productos*
 
 **GET** /productos | Lista todos los productos de Delilah Resto.  
@@ -133,10 +133,10 @@ http://localhost:3000/
 **GET** /productos/{id} | Lista los productos por su id.  
 *ejemplo: http://localhost:3000/productos/1*
 
-**PUT** /productos/{id} | Actualiza los productos por su id.).  
+**PUT** /productos/{id} | Actualiza los productos por su id. | Solo usuario ADMINISTRADOR 
 *ejemplo: http://localhost:3000/productos/1*
 
-**DELETE** /productos/{id} | Borra un producto de uctosIdGet).
+**DELETE** /productos/{id} | Borra un producto por id.  |  Solo usuario ADMINISTRADOR
 *ejemplo: http://localhost:3000/productos/1*  
   
     
@@ -148,17 +148,17 @@ http://localhost:3000/
 **POST** /pedidos | Crear pedidos.  
 *ejemplo: http://localhost:3000/pedidos*
 
-**GET** /pedidos | Lista todos los pedidos de Delilah Resto.  
+**GET** /pedidos | Lista todos los pedidos de Delilah Resto.  |  Solo usuario ADMINISTRADOR
 *ejemplo: http://localhost:3000/pedidos*
     
 
-**GET** /pedidos/{id} | Lista los pedidos por su id.  
+**GET** /pedidos/{id} | Lista los pedidos por su id. 
 *ejemplo: http://localhost:3000/pedidos/1*
 
-**PATCH** /pedidos/{id} | Editar pedidos.  
+**PATCH** /pedidos/{id} | Editar pedidos.|  Solo usuario ADMINISTRADOR
 *ejemplo: http://localhost:3000/pedidos/1*  
 
-**DELETE** /pedidos/{id} | Borrar pedidos.  
+**DELETE** /pedidos/{id} | Borrar pedidos. |  Solo usuario ADMINISTRADOR
 *ejemplo: http://localhost:3000/pedidos/1*
 
 
@@ -166,7 +166,7 @@ http://localhost:3000/
 #
 ### Analice las pruebas end-to-end 🔩
 
-_Explica que verifican estas pruebas y por qué_
+Estas pruebas verifican, que se pueda acceder a los endpoints requeridos y que se cumplan con las condiciones solicitadas en el Check List de Acamica. Se sugiere que se hagan por medio de **POSTMAN**, si no existe frontend.
 
 ```
 Da un ejemplo
