@@ -226,7 +226,7 @@ Este proyecto está bajo la Licencia (MIT)
 * Invita una cerveza 🍺 o un café ☕ a alguien del equipo. 
 * Gracias sinceras a:
     - Gustavo Maggi💕: con tu amor y apoyo, puedo alcanzar mis sueños¡¡
-    - Alejandro Arevalo 🤓 Profe.
+    - Alejandro Arevalo 🤓 Profe https://github.com/alejandroarevalov
     - Camilo Salinas 🤓 Profe https://github.com/Rembrandtsx.
     - Jorge Rojas Compañero 👨‍💻 https://github.com/jorgearojas25.
     - Christian Bravo Compañero 👨‍💻.
